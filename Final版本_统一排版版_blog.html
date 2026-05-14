@@ -1,0 +1,1549 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent 竞品调研</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --paper: #ffffff;
+      --text: #242424;
+      --muted: #6b6b6b;
+      --line: #e6e6e6;
+      --accent: #1a8917;
+      --accent-soft: #f6f7f4;
+      --quote-bg: #fafafa;
+      --sans: sohne, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --serif: charter, "Bitstream Charter", "Sitka Text", Cambria, serif;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--serif);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    .menu-button {
+      position: fixed;
+      left: 24px;
+      top: 24px;
+      z-index: 30;
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 999px;
+      padding: 12px 18px;
+      background: rgba(255,255,255,.96);
+      color: #191919;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+      backdrop-filter: blur(8px);
+      font: 600 14px/1 var(--sans);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .menu-button:hover {
+      background: #fdfdfd;
+    }
+    .layout {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 36px 24px 96px;
+    }
+    .main {
+      min-width: 0;
+    }
+    .hero {
+      max-width: 920px;
+      margin: 0 auto 40px;
+      padding-top: 52px;
+    }
+    .hero h1 {
+      margin: 0 0 18px;
+      font-size: 68px;
+      line-height: 1.02;
+      letter-spacing: -0.045em;
+      font-weight: 700;
+    }
+    .hero .byline {
+      margin: 0;
+      max-width: 840px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font: 400 13px/1.5 var(--sans);
+      letter-spacing: .01em;
+    }
+    .hero .byline::before {
+      content: "";
+      width: 28px;
+      height: 1px;
+      background: #d8d8d8;
+      display: inline-block;
+    }
+    .hero .byline-author {
+      color: #191919;
+      font-weight: 600;
+    }
+    .hero .byline-separator {
+      color: #b0b0b0;
+    }
+    .hero .byline-date {
+      color: #7a7a7a;
+    }
+    .article {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .article h1,
+    .article h2,
+    .article h3,
+    .article h4 {
+      margin: 2.15em 0 .72em;
+      line-height: 1.22;
+      font-weight: 700;
+      scroll-margin-top: 24px;
+      color: #191919;
+    }
+    .article h2:first-child {
+      margin-top: 0;
+    }
+    .article h2 {
+      font-size: 38px;
+      letter-spacing: -0.02em;
+    }
+    .article h3 {
+      font-size: 29px;
+      letter-spacing: -0.015em;
+    }
+    .article h4 {
+      font-size: 22px;
+      letter-spacing: -0.01em;
+    }
+    .article p,
+    .article li {
+      font-size: 20px;
+      line-height: 1.72;
+      color: var(--text);
+    }
+    .article p {
+      margin: 0 0 .95em;
+    }
+    .article ul,
+    .article ol {
+      margin: 0 0 1.1em 1.22em;
+      padding: 0;
+    }
+    .article li + li {
+      margin-top: .22em;
+    }
+    .article hr {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 2.8em 0;
+    }
+    .article strong {
+      font-weight: 700;
+    }
+    .article a {
+      color: inherit;
+      text-decoration-color: rgba(26, 137, 23, 0.35);
+      text-underline-offset: 2px;
+    }
+    .article code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .84em;
+      background: #f2f2f2;
+      padding: .12em .35em;
+      border-radius: 6px;
+    }
+    .article img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      cursor: zoom-in;
+      image-rendering: auto;
+      backface-visibility: hidden;
+    }
+    .article img.common-shot {
+      width: min(100%, 1744px);
+      margin: 20px 0 24px;
+      border-radius: 12px;
+    }
+    .article td img.detail-shot {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: clamp(220px, 24vw, 320px);
+      margin: 12px 0 0;
+      border-radius: 10px;
+      border: 1px solid #ececec;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      background: #fff;
+      object-fit: contain;
+      object-position: center top;
+    }
+    @media (max-width: 900px) {
+      .article td img.detail-shot {
+        height: clamp(180px, 44vw, 260px);
+      }
+    }
+    .article blockquote {
+      margin: 1.7em 0;
+      padding: 0 0 0 22px;
+      background: transparent;
+      border-left: 3px solid #d8d8d8;
+      border-radius: 0;
+    }
+    .article blockquote p:last-child {
+      margin-bottom: 0;
+    }
+    .callout {
+      margin: 1.7em 0 2em;
+      padding: 18px 20px;
+      background: var(--accent-soft);
+      border-left: 3px solid #d9d9d9;
+      border-radius: 4px;
+    }
+    .callout p:last-child,
+    .callout ul:last-child,
+    .callout ol:last-child {
+      margin-bottom: 0;
+    }
+    .callout p,
+    .callout li,
+    .callout p em,
+    .callout li em {
+      font-size: 16px;
+      line-height: 1.7;
+      font-style: normal;
+    }
+    .summary-title {
+      margin: 1.35em 0 .55em;
+      font: 700 18px/1.5 var(--serif);
+      color: #191919;
+      letter-spacing: -0.01em;
+    }
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin: 1.35em 0 1.9em;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 0;
+      content-visibility: auto;
+      contain-intrinsic-size: 900px;
+    }
+    .article table {
+      width: 100%;
+      min-width: 620px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .article th,
+    .article td {
+      padding: 15px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.75;
+      word-break: break-word;
+      white-space: normal;
+      font-size: 14px;
+    }
+    .article th {
+      background: #fafafa;
+      font: 700 13px/1.6 var(--sans);
+      color: #191919;
+    }
+    .plain-list-table thead td,
+    .plain-list-table td {
+      background: transparent;
+      font-weight: 400;
+      font-family: var(--serif);
+      border-bottom: 1px solid #d9d9d9;
+    }
+    .plain-list-table strong {
+      font-weight: 400;
+    }
+    .equal-two-col-table {
+      table-layout: fixed;
+    }
+    .equal-two-col-table th,
+    .equal-two-col-table td {
+      width: 50%;
+    }
+    .trend-table td:first-child {
+      white-space: normal;
+    }
+    .trend-table tbody tr:nth-child(1) td:first-child,
+    .trend-table tbody tr:nth-child(3) td:first-child {
+      font: 700 15px/1.55 var(--sans);
+      color: #191919;
+    }
+    .trend-table tbody tr:nth-child(1) td:nth-child(2) {
+      font: 700 15px/1.55 var(--sans);
+      color: #191919;
+    }
+    .trend-table td[colspan] {
+      width: 100%;
+    }
+    .trend-table tbody tr:nth-child(4) td[colspan] {
+      padding-right: 18px;
+    }
+    .analysis-framework-table td.vertical-label {
+      background: #fafafa;
+      color: #191919;
+      font: 700 14px/1.45 var(--sans);
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      letter-spacing: 0.12em;
+      text-align: center;
+      vertical-align: middle;
+      min-width: 92px;
+      width: 92px;
+      padding: 18px 10px;
+    }
+    .analysis-framework-table {
+      table-layout: fixed;
+    }
+    .analysis-framework-table col.analysis-col-journey {
+      width: 126px;
+    }
+    .analysis-framework-table col.analysis-col-equal {
+      width: calc((100% - 126px) / 5);
+    }
+    .article tr:last-child td {
+      border-bottom: 0;
+    }
+    .toc {
+      position: fixed;
+      left: 18px;
+      top: 64px;
+      bottom: 18px;
+      width: 460px;
+      z-index: 28;
+      padding: 18px 16px 18px;
+      background: rgba(255,255,255,0.98);
+      border: 1px solid rgba(0,0,0,.07);
+      border-radius: 16px;
+      box-shadow: 0 10px 28px rgba(0,0,0,.08);
+      backdrop-filter: blur(12px);
+      overflow-y: auto;
+      transform: translateX(calc(-100% - 24px));
+      opacity: 0;
+      pointer-events: none;
+      transition: transform .24s ease, opacity .24s ease;
+    }
+    body.nav-open .toc {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .toc-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 24;
+      background: rgba(20, 16, 12, 0.18);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .24s ease;
+    }
+    body.nav-open .toc-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .image-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      background: rgba(17, 17, 17, 0.82);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .image-lightbox.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .image-lightbox-toolbar {
+      position: absolute;
+      top: 20px;
+      right: 74px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+    }
+    .image-lightbox-toolbar button {
+      border: 0;
+      background: transparent;
+      color: #191919;
+      font: 600 18px/1 var(--sans);
+      cursor: pointer;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+    }
+    .image-lightbox-toolbar button:hover {
+      background: rgba(0,0,0,.06);
+    }
+    .image-lightbox-zoom-label {
+      min-width: 48px;
+      text-align: center;
+      color: #444;
+      font: 500 13px/1 var(--sans);
+    }
+    .image-lightbox img {
+      max-width: min(92vw, 1400px);
+      max-height: 88vh;
+      width: auto;
+      height: auto;
+      display: block;
+      border-radius: 10px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.28);
+      background: #fff;
+      transform-origin: center center;
+      transition: transform .14s ease;
+    }
+    .image-lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      border: 0;
+      border-radius: 999px;
+      width: 42px;
+      height: 42px;
+      background: rgba(255,255,255,.92);
+      color: #191919;
+      font: 500 24px/1 var(--sans);
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+    }
+    body.lightbox-open {
+      overflow: hidden;
+    }
+    .toc-title {
+      margin: 0 0 14px;
+      color: #191919;
+      font: 700 16px/1.4 var(--sans);
+      letter-spacing: .02em;
+    }
+    .toc-link {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 0 8px 12px;
+      border-left: 2px solid transparent;
+      color: #4b4b4b;
+      text-decoration: none;
+      font: 500 13px/1.5 var(--sans);
+      overflow-wrap: anywhere;
+      transition: color .18s ease, border-color .18s ease;
+    }
+    .toc-link:hover {
+      color: #191919;
+      border-left-color: #191919;
+    }
+    .toc-link.level-3 {
+      padding-left: 30px;
+    }
+    .toc-link.level-4 {
+      padding-left: 52px;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+    }
+    .toc-link.toc-link-nested {
+      padding-left: 74px;
+    }
+    .footer-note {
+      max-width: 860px;
+      margin: 36px auto 0;
+      text-align: center;
+      color: #8a8a8a;
+      font: 400 12px/1.5 var(--sans);
+    }
+    @media (max-width: 1100px) {
+      .layout {
+        padding-inline: 18px;
+      }
+      .hero,
+      .article,
+      .footer-note {
+        max-width: 780px;
+      }
+      .hero h1 {
+        font-size: 56px;
+      }
+      .article p,
+      .article li {
+        font-size: 18px;
+      }
+    }
+    @media (max-width: 768px) {
+      .layout {
+        padding: 20px 14px 56px;
+      }
+      .menu-button {
+        left: 14px;
+        top: 14px;
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+      .toc {
+        left: 12px;
+        right: 12px;
+        width: auto;
+        top: 58px;
+        bottom: 12px;
+      }
+      .hero h1 {
+        font-size: 40px;
+        letter-spacing: -0.035em;
+      }
+      .hero .byline {
+        font-size: 13px;
+      }
+      .article h2 {
+        font-size: 30px;
+      }
+      .article h3 {
+        font-size: 25px;
+      }
+      .article h4 {
+        font-size: 20px;
+      }
+      .article p,
+      .article li {
+        font-size: 18px;
+        line-height: 1.68;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="menu-button" type="button" aria-expanded="false" aria-controls="doc-toc">☰ <span>目录</span></button>
+  <div class="toc-backdrop"></div>
+  <div class="image-lightbox" aria-hidden="true">
+    <div class="image-lightbox-toolbar">
+      <button class="image-lightbox-zoom-out" type="button" aria-label="缩小图片">−</button>
+      <div class="image-lightbox-zoom-label">100%</div>
+      <button class="image-lightbox-zoom-in" type="button" aria-label="放大图片">+</button>
+      <button class="image-lightbox-zoom-reset" type="button" aria-label="重置缩放">↺</button>
+    </div>
+    <button class="image-lightbox-close" type="button" aria-label="关闭图片预览">×</button>
+    <img src="" alt="" />
+  </div>
+  <div class="layout">
+    <main class="main">
+      <header class="hero">
+        <h1>Agent 竞品调研</h1>
+        <p class="byline"><span class="byline-author">Echo</span><span class="byline-separator">·</span><span class="byline-date">2026.5.12</span></p>
+      </header>
+      <article class="article">
+<h2 id="引言"><strong>💡 引言</strong></h2>
+<p>当模型开始真正具备工具调用、长链路推理、环境感知、任务拆解与持续执行等能力之后，“Agent”终于不再只是一个停留在概念层面的词，而开始真正成为一种可以规模化落地的产品形态。</p>
+<p>于是我们会看到，几乎所有头部模型公司都在推进自己的 Agent 产品。与此同时，大量创业公司也开始围绕 Agent 重构产品形态、交互方式与商业逻辑。</p>
+<p>我观察到的一个很有意思的现象是，对于 Agent 产品来说，用户购买的东西，已经不再只是一个模型、一个工具、一次生成结果，而是在消费一种更长期的东西：</p>
+<blockquote>
+<p><strong>“持续协作关系”</strong></p>
+</blockquote>
+<p>用户在使用产品时，不再只是在判断“可用性”，而是会把它隐喻成一个“人”，在这个前提下去判断“我和TA能不能建立长期、良好的协作关系”</p>
+<ul>
+<li>你靠谱吗？</li>
+<li>你能不能替我托管任务，并且完成得让我满意？</li>
+<li>你和我之间能不能形成可积累的默契？</li>
+</ul>
+<p>这也是本篇调研想要讨论的，不只是 Agent 做了哪些功能，而是一个更核心的问题：</p>
+<blockquote>
+<p><strong>好的 Agent 产品，到底是怎样通过“关系设计”一步步获得用户的信任，最终成为用户眼中“一个值得协作的对象”？</strong></p>
+</blockquote>
+<p>本文将在这个视角下重点分析三类头部产品：OpenAI Codex、Claude Code 和 Gemini CLI。我会从产品战略、体验设计和商业模式三个层面展开，也希望这份调研中的一些观察与思考，能为 DeepSeek 后续的 Agent 产品设计带来一些小小的 insight ♥️</p>
+<p>那么下面，我们就正式进入正文吧！</p>
+<hr>
+<h2 id="1核心竞品选择"><strong>1、核心竞品选择</strong></h2>
+<div class="callout">
+<p><em>本章先对当前 Agent 产品的主流形态进行了整体概览，并结合 DeepSeek 的公司发展路径进行对照，判断其更接近哪一类 Agent 路线，以选择最有参考价值的核心竞品。</em></p>
+<p><em>从技术演进趋势来看，模型与其所驱动的 Agent 系统正在变得越来越不可分割。结合 DeepSeek 在近期论文更新中对模型上下文能力、复杂推理能力及多模态能力等维度所做的增强与优化，我认为 DeepSeek 未来的发展路径更可能指向对“Agent 作为模型底层原生属性”的探索，即从模型底层构建支持 Agent 运行的基础设施闭环。基于这一判断，我选取当前该赛道中的三个头部产品——OpenAI Codex、Claude Code 与 Gemini CLI——作为核心竞品进行分析。原因在于，它们均代表了“模型 + Agent 产品”的发展范式，并且分别体现了该赛道中具有代表性的三种不同技术路径，因而具有较强的对标价值与研究参考意义。</em></p>
+</div>
+<h3 id="11-agent产品概览"><strong>1.1 Agent产品概览</strong></h3>
+<p>自从大模型能力从"对话生成"迈向"任务执行"（以工具调用、多步推理与长上下文能力成熟为标志）之后，AI 行业开始进入从"能力供给"走向"结果交付"的阶段：</p>
+<blockquote>
+<p>💪 <strong>从能力上来说</strong>：以 GPT、Gemini、Claude 为代表的模型，在全局规划能力、上下文效率与原生长效记忆、环境感知与自我反思和任务粒度的精细化调度得到了深度的优化。</p>
+</blockquote>
+<blockquote>
+<p>💰 <strong>从商业模式上来说</strong>：Agent 通过承接完整任务链路（如编程、数据分析、办公自动化等），能够显著提升用户留存与付费意愿，使 AI 产品从"工具订阅"向"生产力交付"甚至"结果付费"转变；同时，Agent 也成为模型厂商延伸价值链的关键抓手，通过用模型构建“Agent 执行复杂现实任务的能力底座”，强化生态绑定与分发能力。</p>
+</blockquote>
+<p>而在这一趋势下，目前行业内的 Agent 形态按照其"<strong>能力栈分层</strong>"可大体被分为四类：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>分类</th>
+<th>描述</th>
+<th>代表产品</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>模型 + Agent 一体化</strong>   👉 上游模型层（模型即产品）</td>
+<td>这类产品强调「基础模型 + Agent 架构」的深度耦合设计，目标不只是提供工具，而是构建"AI 原生应用"本身，并持续向 AGI 方向进行能力与形态的演进布局。模型能力与产品体验之间几乎没有分层，二者共同构成竞争壁垒。</td>
+<td><em>Gemini（Google）、OpenAI Codex（OpenAI）、Claude Code（Anthropic）</em></td>
+</tr>
+<tr>
+<td><strong>Agent 平台</strong>   👉 能力基础设施层（中台）</td>
+<td>这类产品提供 Agent 构建与执行的基础设施，包括IDE嵌入、任务编排、工具调用、记忆与上下文管理、多 Agent 协同等核心能力，可以插入不同的模型底座。</td>
+<td><em>Cursor、Windsurf、LangChain、LangGraph、Dify、Coze 等</em></td>
+</tr>
+<tr>
+<td><strong>封装式 Agent 执行系统</strong>   👉 通用执行层（产品化 Agent）</td>
+<td>这类产品本质上是"高度封装的通用 Agent 执行系统"，通过弱化复杂配置与调参过程，强化"黑盒式执行"的体验。其核心价值在于"你只需交付任务，我负责完成"，而不是"你参与调度，我协助执行"。</td>
+<td><em>Manus、Devin、Lovable 等</em></td>
+</tr>
+<tr>
+<td><strong>Agent 垂类工具</strong>   👉 场景应用层（垂直工具）</td>
+<td>这类产品专注于在特定场景下为用户高效完成某类任务，例如信息检索、内容生成、代码补全、会议记录等。通常围绕单一或相对清晰的使用场景进行深度优化，用户以更直接的方式获得稳定、可预期的结果。</td>
+<td><em>Perplexity（搜索）、Notion AI（知识管理）、Otter.ai（会议记录）</em></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="12-选择最合适的核心竞品"><strong>1.2 选择最合适的核心竞品</strong></h3>
+<p>从 DeepSeek 模型的更新历史来看，无论是 DeepSeek-V3.1 对 agentic tool use 的强化，V3.2 对 “thinking” 模式与工具调用的集成，还是 V4 发布后对主流 Agent 工具的原生集成，以及其在内部 agentic coding 场景中的落地使用，都意味着 DeepSeek 正在以自研模型为核心，向完整的 Agent 产品形态延展，而不是把 Agent 能力外包给第三方平台。</p>
+<p>基于这个判断，后面的竞品调研我会优先聚焦同属这条路线的三个代表产品：OpenAI Codex、Claude Code 和 Gemini CLI。之所以选这三家，不只是因为它们都属于“模型 + Agent 一体化”这条大路线，更重要的是，它们虽然同属一类，但各自在模型能力驱动下展现出来的 Agent 产品形态和思路是很不一样的。</p>
+<div class="table-wrap"><table class="plain-list-table">
+<thead>
+<tr>
+<td>1️⃣ OpenAI Codex 更像是在把 Agent 纳入一个更完整的平台生态里，重点是一体化，以及在多个工作触点之间打通协作。</td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2️⃣ Claude Code 更像是在把 Agent 往“工程协作者”的方向做，强调可治理、可沉淀，也更适合嵌进组织和团队流程里。</td>
+</tr>
+<tr>
+<td>3️⃣ Gemini CLI 则更偏向另一种开放路线：开源、低门槛、开发者友好，先把使用门槛降下来，再慢慢把生态做起来。</td>
+</tr>
+</tbody>
+</table></div>
+<p>这样进行横向对比，Agent产品定位和发展思路拉的足够开，更容易看出这个方向的不同“玩家”到底在怎么做选择，也更容易从中拿到一些有价值的insight。</p>
+<h2 id="2核心竞品分析"><strong>2、核心竞品分析</strong></h2>
+<div class="callout">
+<p>本章的竞品分析主要围绕<strong>产品战略定位、协作体验、商业化模式</strong>三个核心目标展开：</p>
+<p>🧭 <strong>产品战略定位</strong>：我会从长的时间轴来看，观测其产品定位选择与关键决策，理解"在什么阶段、基于什么判断做了哪些动作"，并进一步推演其未来可能的演进方向，从而洞察 Agent 产品战略层面的发展趋势。</p>
+<p>🎯 <strong>协作体验</strong>：回到具体场景里，用真实任务去跑，重点看 Agent 在协作中到底扮演了什么角色，又是怎么一步步和用户建立更深的协作关系的，观察哪些体验细节真正影响了用户愿不愿意继续把任务交给它，为我们的产品设计提供参考。</p>
+<p>💸 <strong>商业化模式</strong>：看产品怎么把价值闭环搭起来，包括定价、付费转化，以及收费方式和用户感知价值之间是否匹配，思考如何设计一个既能支撑长期发展、又能驱动产品持续向用户偏好演进的商业机制。</p>
+</div>
+<h3 id="21-产品战略对比"><strong>2.1 产品战略对比</strong></h3>
+<div class="callout">
+<p>本章汇总了OpenAI Codex、Claude Code 和 Gemini CLI三家产品从发布到现在的时间轴上的产品关键动作，并基于这些动作总结产品之间存在的差异和共性，目标是为了从差异去看壁垒、从共性去看趋势。小结如下：</p>
+<p>从产品选择差异上来看，Agent的护城河有三个方向：</p>
+<ul>
+<li>生态整合能力｜codeX</li>
+<li>流程嵌入和治理深度｜Claude code</li>
+<li>开放、低成本和用户规模｜Gemini CLI</li>
+</ul>
+<p>从产品选择共性上来看，Agent的发展趋势有三个轴线：</p>
+<ul>
+<li>更联通：都在增强Agent的联通生态，产品形态向「all-in-one」演化</li>
+<li>更懂我：都在增强Agent的环境感知和记忆能力</li>
+<li>更靠谱：都在增强Agent的长任务拆解能力，并将生产环境向企业升级</li>
+</ul>
+</div>
+<h4 id="221-差异化选择体现的三个agent的护城河方向"><strong>2.2.1. 差异化选择体现的三个Agent的“护城河方向”</strong></h4>
+<ul>
+<li>Codex 走的是“平台化 AGI 入口”路线，更相信生态整合能力</li>
+<li>Claude Code 走的是“企业级数字员工”路线，更相信流程嵌入和治理深度</li>
+<li>Gemini CLI 走的是“开源开发者协作终端”路线，更相信开放、低成本和用户规模</li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th><strong>维度</strong></th>
+<th><strong>Codex</strong></th>
+<th><strong>Claude Code</strong></th>
+<th><strong>Gemini CLI</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>产品定位</td>
+<td>以云端为核心，面向更完整的 AGI 产品形态延展</td>
+<td>强调治理、能力和组织协作的一体化，像“可管理的数字员工”</td>
+<td>以开源和终端优先为基础，做低门槛、可扩展的开发者协作终端</td>
+</tr>
+<tr>
+<td>目标用户</td>
+<td>从个人开发者到企业团队的广泛用户</td>
+<td>高价值企业客户、重度开发者、治理要求高的组织</td>
+<td>个人开发者、学生，以及重视开放性和成本的用户</td>
+</tr>
+<tr>
+<td>初始形态</td>
+<td>云端平台，与 ChatGPT 深度联动</td>
+<td>终端工具，与本地工作环境深度融合</td>
+<td>开源 CLI，与 Gemini Code Assist 打通</td>
+</tr>
+<tr>
+<td>演进方向</td>
+<td>扩大生态覆盖面，打通终端、IDE、Web、移动、GitHub 等触点</td>
+<td>提升自主性、可治理性和组织嵌入能力，成为工程体系中的正式角色</td>
+<td>借助扩展、subagents、hooks、browser agent 等能力，走开放生态路线</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="212-共性趋势下agent演化方向的三个重要轴线"><strong>2.1.2. 共性趋势下Agent演化方向的三个重要轴线</strong></h4>
+<ul>
+<li>更联通：都在增强Agent的联通生态，产品形态向「all-in-one」演化</li>
+<li>更懂我：都在增强Agent的环境感知和记忆能力</li>
+<li>更靠谱：都在增强Agent的长任务拆解能力，并将生产环境向企业升级</li>
+</ul>
+<div class="table-wrap"><table class="trend-table">
+<thead>
+<tr>
+<th><strong>共性趋势1｜更联通</strong></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>👐 关键动作：增强Agent的联通性生态</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Agent 正在从"一个独立的对话入口"演化为"<strong>一个统一代理 + 多个工作触点</strong>"的形态，逐步嵌入 IDE、代码托管平台、项目管理工具、协作平台、自动化系统，甚至 iOS 等移动端入口中，做到更无缝地接入用户已有的工作流、贯穿更多工作触点。同时，插件、MCP、skills 等生态也在不断补齐，让 Agent 能通过更开放的接口体系持续扩展能力边界。</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="3">💆 用户体验：和TA协作的迁移成本降低了，可扩展的潜力提升了</td>
+</tr>
+<tr>
+<td colspan="3">用户无需频繁切换工具、搬运上下文或迁移各类文件，就能将 Agent 无缝嵌入当前工作流中获得增量支持，<strong>0 到 1 的迁移成本显著降低</strong>，可扩展性和自定义自由度显著提升，用户进而更容易与 Agent 建立长期协作关系，而不只是将其视为一次性工具。</td>
+</tr>
+<tr>
+<td>*附录表格1</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrap"><table class="trend-table">
+<thead>
+<tr>
+<th><strong>共性趋势2｜更懂我</strong></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>👐 关键动作1：增强Agent的环境感知能力</td>
+<td>👐 <strong>关键动作2</strong>：记忆向“可持续系统能力”转化</td>
+<td></td>
+</tr>
+<tr>
+<td>相比只理解 prompt 本身，Agent 正在进一步理解用户所处的真实工作环境。它不仅要读取仓库、理解文件结构、感知当前运行环境和项目状态，还要在必要时接入终端、浏览器甚至 computer use 去观察“屏幕上正在发生什么”，从多种信息源拼出更完整的现场，再结合上下文做出更有针对性的判断，真正做到<strong>基于现场做决策、基于场景给方案</strong>。</td>
+<td>Agent 的记忆正在从"临时对话中的上下文"演变为"<strong>可持久、可分层、可压缩、可恢复、可管理的工作记忆系统</strong>"。也就是说，记忆正在从模型内部能力，逐步转向更像产品层和系统层的能力，并被进一步封装成可编辑、可配置、可自定义的系统能力。</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="3">💆 用户体验：和TA协作的沟通成本降低了，默契程度提升了</td>
+</tr>
+<tr>
+<td colspan="3">用户可以用更少的解释成本，获得更贴合当前项目场景和上下文的、更准确有针对性的解决方案；同时让用户在不同任务和场景下拥有更强的掌控感与信任感，也更有利于建立稳定的协作关系。</td>
+</tr>
+<tr>
+<td>*附录表格2</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrap"><table class="trend-table">
+<thead>
+<tr>
+<th><strong>共性趋势3｜更靠谱</strong></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>👐 关键动作1：更接近企业级的生产环境</td>
+<td>👐 <strong>关键动作2</strong>：增强复杂长任务拆解与执行能力</td>
+<td></td>
+</tr>
+<tr>
+<td>Agent 正在从"适合 vibe coding 的辅助工具"走向真正的<strong>企业级生产环境参与者</strong>。这意味着它不能只会生成代码，还要在代码质量、权限边界、审计追踪、审批机制、可观察性和安全治理等方面，逐步达到真实工程系统的标准，从而嵌入真实的生产流程中。</td>
+<td>Agent 正在转向更贴近真实开发流程的工作方式：面对复杂长任务，它不再依赖单次交互完成，而是要先建立任务目标与约束，再做阶段性计划、子任务拆解、工具选择、执行排序、过程检查、结果验证与异常回退，并在中途根据新信息持续重规划。也就是说，长任务能力不只是“会拆解”，而是形成了一整套更接近工程执行的闭环，让复杂任务能够被分段推进、留痕校验，并在卡住时继续往前走。</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="3">💆 用户体验：和TA协作的不确定性减少了，标准化程度提升了，更有安全感</td>
+</tr>
+<tr>
+<td colspan="3">用户不再只是获得 demo 级别的结果，而是能得到接近生产级别、可直接进入工程流程的交付物。同时当任务拆解和循环验证流程越标准化，用户越能感受到 Agent 对任务的稳定托管和持续推进，进而提升对执行过程和结果的信任；这种信任会促使用户把更多任务交给 Agent，扩大其可承担的能力边界，增强协作深入性，并提升长期关系和信任建立的可能性。</td>
+</tr>
+<tr>
+<td>*附录表格3</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="22-产品体验对比"><strong>2.2 产品体验对比</strong></h3>
+<div class="callout">
+<p>如引言所述，我认为Agent的体验核心不在于单纯的功能设计，而在于“关系设计”。其最终目标是通过这种关系的建立，让用户逐渐对Agent产生信任，进而愿意把重要的任务交给它，甚至接受它更深度的嵌入自己的生活。因此本章将围绕“建立协作关系”构建体验分析框架，并从桌面产品端、CLI端对三款产品端用户体验旅程进行分析，同时对比其体验的共同选择，与差异，以推导理想的Agent体验都应该关注什么。小结如下：</p>
+<p>1）Agent产品体验的核心逻辑，本质上是在模拟“面试一个长期协作对象”的过程，目标是在「第一印象、任务测试、结果验收、问题迭代、决定长期协作」的长线周期里，从智商和情商两个维度去塑造一个值得长期协作与信赖的Agent伙伴画像。<br>
+2）从体验对比来看，不同的Agent产品塑造的伙伴画像不同：CodeX是一个高情商而且聪明贴心的朋友，很会给人情绪价值；Claude Code是一个严谨专业靠谱的同事，有的时候甚至有点古板；Gemini CLI则是一个开放透明又便宜的实习生。而这些人设定位导致同样功能下不同的产品表达和设计决策，进而衍生出差异化的产品体验。</p>
+</div>
+<h4 id="221-分析框架"><strong>2.2.1. 分析框架</strong></h4>
+<p>Agent的产品体验本质上是在解决“如何建立良好的协作关系”的问题，我们需要通过“关系设计”让用户逐步形成一种感受：这是一个值得合作、值得交付任务、甚至值得长期信赖的对象。而影响关系建立的因素包括两部分：</p>
+<ul>
+<li>第一是硬实力「智商」：即TA能力怎么样？能不能出色的完成我托管给他的任务？</li>
+<li>第二是软实力「情商」：即TA的性格（人设）、沟通方式、反馈节奏甚至情绪价值</li>
+</ul>
+<p>综合「情商」和「智商」的思考维度，我围绕“关系设计”给出了以下的体验分析框架：</p>
+<div class="table-wrap"><table class="analysis-framework-table">
+<colgroup><col class="analysis-col-journey"><col class="analysis-col-equal"><col class="analysis-col-equal"><col class="analysis-col-equal"><col class="analysis-col-equal"><col class="analysis-col-equal"></colgroup><thead>
+<tr>
+<th>用户的体验旅程</th>
+<th>「第一印象」</th>
+<th>「任务测试」</th>
+<th>「结果验收」</th>
+<th>问题迭代</th>
+<th>长期协作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="vertical-label">用户的心理模型</td>
+<td>我能不能快速理解TA的价值？</td>
+<td>我敢不敢把任务交给TA完成？</td>
+<td>TA交付的结果是否符合我的期望？</td>
+<td>TA能不能对齐我的改进意见？</td>
+<td>和TA长期协作的ROI怎么样？</td>
+</tr>
+<tr>
+<td class="vertical-label">用户期望的伙伴画像</td>
+<td>目标明确、专业可信、容易理解 👉<br><em>让我一眼就知道TA能帮我做什么</em></td>
+<td>过程可见、进度可知、边界清晰、主动反馈、工作留痕<br>👉<br><em>让我始终处于可感知、可介入、可回溯的协作状态中</em></td>
+<td>结果可见、可用、可被接受和调整<br>👉<br><em>让我处于有掌控感、可验证、可继续推进的状态</em></td>
+<td>修改边界清晰（知道什么该改什么不该）、修改版本留痕<br>👉<br><em>让我拥有对修改过程和结果的掌控感和安全感</em></td>
+<td>能做到 all-in-one（嵌入各个场景工作流为我提供增量）、能懂得我理解我、token 消耗合理 👉<br><em>让我感觉每一次投入都在累积长期价值</em></td>
+</tr>
+<tr>
+<td class="vertical-label">产品体验关注点</td>
+<td>• TA的人设是否清晰好理解<br>• TA看起来是不是合作性高、有礼貌也听话</td>
+<td>• TA 的任务理解度和听话程度如何<br>• TA 的执行进程是否透明可见<br>• TA 的执行进度是否可感知<br>• TA 能否识别卡点问题，并主动确认反馈<br>• TA 懂不懂工作留痕</td>
+<td>• TA 的交付物可读性如何<br>• TA 的交付物内容是否完整准确可用<br>• TA 的交付物是否会考虑到 plan b、plan c</td>
+<td>• 和 TA 对齐的沟通成本如何<br>• TA 进行修改的准确性怎么样<br>• TA 的修改有没有归档、复盘和自我优化</td>
+<td>• 长期和 TA 合作我投入的成本有多高<br>• 长期和 TA 合作我获得的回报如何</td>
+</tr>
+<tr>
+<td class="vertical-label">产品转化流失点</td>
+<td>• 根本读不懂，无法快速判断是否能帮我解决问题<br>• 感觉驾驭不了，从入门到放弃</td>
+<td>• 我没办法控制 TA<br>• 过程黑盒，我不知道 TA 现在在做什么<br>• 进度不及时告知，我很焦虑<br>• 没有留痕追踪，我不敢信任结果</td>
+<td>• 交付物可读性差，无法判断效果<br>• 交付物不符合预期，怀疑 TA 的能力<br>• 考虑问题不够全面，不够聪明</td>
+<td>• 沟通成本太高需要说十遍<br>• 一改就偏离原意，很失控<br>• "售后"体验差，无法回滚，同样问题还会再出现</td>
+<td>• token 消耗大，成本太高<br>• 联通性差，我的迁移成本很高<br>• 加分项不够多（比如个性化、结果爆好）</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="222-分析实例"><strong>2.2.2. 分析实例</strong></h4>
+<p>基于以上的体验分析框架我会分别对三款产品，最有用户心智的两个形态桌面端产品体验和CLI产品体验进行分析</p>
+<h4 id="2221-桌面端产品体验"><strong>2.2.2.1 桌面端产品体验</strong></h4>
+<div class="callout">
+<p class="summary-title">一个值得建立关系的协作伙伴应该有这样的“画像特质”：</p>
+<ul>
+<li>初次握手时，让用户不被“吓跑”：简单直接、容易交流，有良好的上下兼容性</li>
+<li>任务测试时，让用户保持掌控感：情商高、思考清晰，能主动向上管理、反馈及时、响应迅速</li>
+<li>结果对焦时，让用户满意且安心：智商高结果交付的好，并负责任的持续在场解决问题</li>
+<li>迭代沟通时，让用户轻松省心：理解力强，沟通效率高，会复盘，能从反馈中学习进步，举一反三</li>
+<li>长期相处下来，让用户感受到虽然有投入但是ROI很高：性价比高、具备持续成长和深度协同的潜力，越用越默契、越用越离不开</li>
+</ul>
+<p>不同的产品可以构建差异化特质，塑造体验亮点：</p>
+<ul>
+<li>CodeX像一个“贴心聪明好相处的朋友”，协作的入门成本很低</li>
+<li>Claude Code像一个“非常严谨专业但有点古板的同事”，协作的天花板很高</li>
+</ul>
+</div>
+<h4 id="阶段一初次握手"><strong>🤝 阶段一：初次握手</strong></h4>
+<blockquote>
+<p><strong>产品目标</strong>：第一不要吓跑用户，第二建立用户心智。
+<br><strong>伙伴画像</strong>：简单直接容易交流，人设定位明确。</p>
+</blockquote>
+<p><strong>基本能力</strong>：</p>
+<p>页面结构层级较少，整体简洁且易于理解，只保留主功能区和辅助功能区两部分。信息组织上详略得当，用户认知负荷低。</p>
+<img class="common-shot" src=".preview-cache/%E5%85%B1%E6%80%A701.jpg-w1200.webp" alt="共性01" width="2616" height="1158" loading="lazy" decoding="async" data-fullsrc="共性01.jpg.png" fetchpriority="low">
+<p><strong>差异化竞争力</strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>🧒 <strong>CodeX 心智 for 大众用户：门槛很低，快速上手</strong></th>
+<th>🧑‍💻 <strong>Claude Code 心智 for 开发者：我超专业，来用或来学</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>借助大众最易理解的 GUI 降低了专业指令的使用门槛，但同时也保留终端、代码树等专业工具，具备较高的上下兼容性。</td>
+<td>保留IDE的操作结构，上下兼容度没有CodeX那么高，但即便是小白用户也能建立起“专业强大”的心理认知，能产生好奇和学习动力。</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrap"><table class="equal-two-col-table">
+<thead>
+<tr>
+<th>CodeX</th>
+<th>Claude Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1）引导非常清晰，方便用户快速开始，对于小白用户来说非常友好，理解成本很低<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8201-1.jpg-w900.webp" alt="差异01-1" width="1263" height="1158" loading="lazy" decoding="async" data-fullsrc="差异01-1.jpg.png" fetchpriority="low"></td>
+<td>1）入口更像「开发工作台」，借鉴了IDE（底部命令行）和GitHub（热力图看板），<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8201-2.jpg-w900.webp" alt="差异01-2" width="1299" height="1158" loading="lazy" decoding="async" data-fullsrc="差异01-2.jpg.png" fetchpriority="low"></td>
+</tr>
+<tr>
+<td>2）GUI产品层封装的很好，比如 Skill、插件等能力都用GUI组织起来，用户不需要理解太多底层逻辑就能完成操作；也能够从输入指令转化到可操作GUI。对大众用户来说降低了理解成本，会觉得TA很贴心、很聪明，且包容度很高<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8201-3.jpg-w900.webp" alt="差异01-3" width="1263" height="1158" loading="lazy" decoding="async" data-fullsrc="差异01-3.jpg.png" fetchpriority="low"></td>
+<td>2）虽然有 GUI 参与，但整体仍保留了更多命令式快捷操作和提示。例如斜杠命令现在支持直接查看列表，用户不需要再翻文档或记忆功能，就能快速了解每个命令能做什么，可理解性更高。对开发者来说操作更快捷了，会觉得TA很贴心<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8201-4.jpg-w900.webp" alt="差异01-4" width="1299" height="1158" loading="lazy" decoding="async" data-fullsrc="差异01-4.jpg.png" fetchpriority="low"></td>
+</tr>
+<tr>
+<td>3）工作栏以大众用户的信息理解视角组织,project,chat都是没有太大理解成本的<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8201-5.jpg-w900.webp" alt="差异01-5" width="1263" height="1158" loading="lazy" decoding="async" data-fullsrc="差异01-5.jpg.png" fetchpriority="low"></td>
+<td>3）工作栏以开发者的信息理解视角组织,例如session，都是开发环境里的术语<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8201-6.jpg-w900.webp" alt="差异01-6" width="1299" height="1158" loading="lazy" decoding="async" data-fullsrc="差异01-6.jpg.png" fetchpriority="low"></td>
+</tr>
+<tr>
+<td>4）虽然强化大众心智，但是保留终端、分支、git等等调试能力，仍旧能够向上兼容开发者的需求<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8201-7.jpg-w900.webp" alt="差异01-7" width="1263" height="1158" loading="lazy" decoding="async" data-fullsrc="差异01-7.jpg.png" fetchpriority="low"></td>
+<td>4）开发者心智更强，专业度更高，可以很方便地查看代码分支、git 等信息，都有很直接的透出，类似 IDE 的设计<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8201-8.jpg-w900.webp" alt="差异01-8" width="1299" height="1158" loading="lazy" decoding="async" data-fullsrc="差异01-8.jpg.png" fetchpriority="low"></td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="阶段二任务测试"><strong>⏰ 阶段二：任务测试</strong></h4>
+<blockquote>
+<p><strong>产品目标</strong>：保持用户对项目任务的掌控感。
+<br><strong>伙伴画像</strong>：高情商，思考过程清晰，能够主动向上管理并及时反馈，响应也足够迅速。</p>
+</blockquote>
+<p><strong>基本能力</strong>：</p>
+<ul>
+<li><strong>执行前</strong>：都会先向我确认一些不明确的细节，避免在信息不足的情况下直接执行。</li>
+<li><strong>执行中</strong>：任务流程整体是透明的，支持任务拆分，因此既能看到大任务的整体进度，也能看到更细粒度的执行过程。同时，它也支持查看真实的脚本详情，整个过程基本都有留痕，便于追踪和理解。值得一提的是，两款产品都在近期更新了 computer use 的功能，让 Agent 能够帮用户操作“电脑屏幕”。</li>
+<li><strong>卡点主动反馈确认</strong>：在遇到权限问题时，都会主动发起提问，不会越权执行。</li>
+<li><strong>打断介入</strong>：支持任务排队，也支持中途打断并介入。</li>
+</ul>
+<p><strong>差异化竞争力</strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>♥️ <strong>CodeX更像一个“聪明贴心的朋友”感觉很真诚，沟通体验好</strong></th>
+<th>🔨 <strong>Claude Code像专业严谨但略严肃的同事，值得依靠，但沟通更一板一眼</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TA 很聪明，也更省心、更“傻瓜友好”，同时情商比较高，能够提供较多情绪价值，因此整体软实力体验更好。</td>
+<td>TA 专业程度很高，留痕做得完善，结构化也很清晰，操作更加精细化；但整体风格相对比较“古板”，很严肃。</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrap"><table class="equal-two-col-table">
+<thead>
+<tr>
+<th>CodeX</th>
+<th>Claude Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1）默认权限状态我要确认的更少<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8202-1.jpg-w900.webp" alt="差异02-1" width="1263" height="1158" loading="lazy" decoding="async" data-fullsrc="差异02-1.jpg.png" fetchpriority="low"></td>
+<td>1）默认权限状态我要确认的更多<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8202-2.jpg-w900.webp" alt="差异02-2" width="1299" height="1158" loading="lazy" decoding="async" data-fullsrc="差异02-2.jpg.png" fetchpriority="low"></td>
+</tr>
+<tr>
+<td>3）有留痕但追溯起来，但颗粒度相对比较粗，查看起来也没有那么容易<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8202-5.jpg-w900.webp" alt="差异02-5" width="1263" height="1158" loading="lazy" decoding="async" data-fullsrc="差异02-5.jpg.png" fetchpriority="low"></td>
+<td>3）留痕体验更精细，你可以打开一个面板直接去查看不同agent在做的任务，以及规划内容；以及你去查看代码分支的时候更详细，更全面<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8202-6.jpg-w900.webp" alt="差异02-6" width="1299" height="1158" loading="lazy" decoding="async" data-fullsrc="差异02-6.jpg.png" fetchpriority="low"></td>
+</tr>
+<tr>
+<td>4）对话体验感更聪明，不需要给很详细或结构化的输入，也可以比较准确地理解我的意图和需求；同时情绪价值提供得不错，且有真诚的感觉<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8202-7.jpg-w900.webp" alt="差异02-7" width="1263" height="1158" loading="lazy" decoding="async" data-fullsrc="差异02-7.jpg.png" fetchpriority="low"></td>
+<td>4）对话非常严谨，细节控，要非常清楚地确定你需求的种种细节，才会执行，没啥情绪价值提供，但真的很严谨<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8202-8.jpg-w900.webp" alt="差异02-8" width="1299" height="1158" loading="lazy" decoding="async" data-fullsrc="差异02-8.jpg.png" fetchpriority="low"></td>
+</tr>
+<tr>
+<td>5）规划能力的呈现更产品视角，注重与用户的交互关系，通过更像人的沟通过程让用户感受到“模型进行了更深度的思考，靠谱可控指数提升”<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8202-9.jpg-w900.webp" alt="差异02-9" width="1263" height="1158" loading="lazy" decoding="async" data-fullsrc="差异02-9.jpg.png" fetchpriority="low"></td>
+<td>5）规划能力的呈现更工程视角，将规划当作一种「能力」呈现，注重其可解释性和可治理性，通过完整严谨的呈现&amp;留痕规划过程的内容模块，给工程师安全感和掌控感<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8202-10.jpg-w900.webp" alt="差异02-10" width="1299" height="1158" loading="lazy" decoding="async" data-fullsrc="差异02-10.jpg.png" fetchpriority="low"></td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="阶段三结果对焦"><strong>⏰ 阶段三：结果对焦</strong></h4>
+<blockquote>
+<p><strong>产品目标</strong>：高质量交付，并保证"持续在场感"。
+<br><strong>伙伴画像</strong>：高智商，结果交付的好，保持在场 stand by，有安全感负责任。</p>
+</blockquote>
+<p><strong>基本能力</strong>：</p>
+<p>能够交付质量不错的结果，完成后结果直接预览，并且支持选中元素进行批注编辑，方便用户在结果确认阶段快速介入，完成进一步校准。一个小小的不同点是，Claude 的预览是实时渲染，体验更好。</p>
+<img class="common-shot" src=".preview-cache/%E5%85%B1%E6%80%A703.jpg-w1200.webp" alt="共性03" width="2616" height="1158" loading="lazy" decoding="async" data-fullsrc="共性03.jpg.png" fetchpriority="low">
+<p><strong>差异化竞争力</strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>👋 <strong>CodeX强调“陪伴在场感”</strong></th>
+<th>👊 <strong>ClaudeCode强调“可靠监控感”</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>让用户感觉自己随时可以唤起 TA 来解决问题，整体托管性更强，给人一种可以 take over 给 TA 的感觉。</td>
+<td>但托管性相对较弱，给人的感觉是用户仍然保留操作主导权，而它在后台承担 back up 的角色。</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrap"><table class="equal-two-col-table">
+<thead>
+<tr>
+<th>CodeX</th>
+<th>Claude Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>支持全屏预览，但对话框常驻底部，作为驻场伙伴，用户可以随时唤起<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8203-1.jpg-w900.webp" alt="差异03-1" width="1263" height="1158" loading="lazy" decoding="async" data-fullsrc="差异03-1.jpg.png" fetchpriority="low"></td>
+<td>工作台布局，但不支持单个窗口全部展开，更像是一个“监控面板”<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8203-2.jpg-w900.webp" alt="差异03-2" width="1299" height="1158" loading="lazy" decoding="async" data-fullsrc="差异03-2.jpg.png" fetchpriority="low"></td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>CodeX工作流类提效任务交付体验好</th>
+<th>Claude Code复杂任务结果完成度高</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>擅长处理工作流类的提效场景任务（例如联通 notion 定期做知识整理复盘），交付又快又好；但不擅长处理复杂工程任务（例如 vibe coding 一个 iOS APP）。</td>
+<td>非常擅长处理复杂工程任务，在同等轮次和输入下，交付质量明显优于 CodeX，且稳定性很高，能很好很快地理解产品交互逻辑，并完成稳定、可验证的 demo。</td>
+</tr>
+<tr>
+<td><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8203-buchong1.jpg-w900.webp" alt="差异03-buchong1" width="1263" height="1158" loading="lazy" decoding="async" data-fullsrc="差异03-buchong1.jpg.png" fetchpriority="low"></td>
+<td><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8203-buchong2.jpg-w900.webp" alt="差异03-buchong2" width="1299" height="1158" loading="lazy" decoding="async" data-fullsrc="差异03-buchong2.jpg.png" fetchpriority="low"></td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="阶段四迭代沟通"><strong>🚧 阶段四：迭代沟通</strong></h4>
+<blockquote>
+<p><strong>产品目标</strong>：能围绕需求高效迭代，准确理解并稳定执行，并且总结问题并持续优化协作方式。
+<br><strong>伙伴画像</strong>：理解力强，沟通效率高，能够快速对齐真实需求；会复盘，能从反馈中学习进步，越合作越默契。</p>
+</blockquote>
+<p><strong>差异化竞争力</strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>👋 <strong>CodeX上下文窗口长，但二次犯错概率高，经常需要回滚</strong></th>
+<th>🧠 <strong>Claude Code需求对齐的粒度很高，迭代高效准确</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>能够沟通和迭代，但随着会话任务变长，它会忘记之前讨论过的问题或提出的改进点，导致修改越往后越容易失控。</td>
+<td>在上下文理解与记忆能力上明显更强。用得越久，它交付的结果就越贴合你的需求，并且能持续记住上下文，带来一种共同成长的默契感。</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrap"><table class="equal-two-col-table">
+<thead>
+<tr>
+<th>CodeX</th>
+<th>Claude Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%82%E6%80%A704-1.jpg-w900.webp" alt="差异性04-1" width="1263" height="1158" loading="lazy" decoding="async" data-fullsrc="差异性04-1.jpg.png" fetchpriority="low"></td>
+<td><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%82%E6%80%A704-2.jpg-w900.webp" alt="差异性04-2" width="1299" height="1158" loading="lazy" decoding="async" data-fullsrc="差异性04-2.jpg.png" fetchpriority="low"></td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="阶段五长期合作"><strong>♻️ 阶段五：长期合作</strong></h4>
+<blockquote>
+<p><strong>产品目标</strong>：让用户持续感受到"投入是有回报的"，并清晰看到长期回报的增长空间。
+<br><strong>伙伴画像</strong>：ROI 高、性价比高，值得长期投入；不仅当下好用，还具备持续成长和深度协同的潜力，越用越默契、越用越离不开。</p>
+</blockquote>
+<p><strong>差异化竞争力</strong>：</p>
+<div class="table-wrap"><table class="equal-two-col-table">
+<thead>
+<tr>
+<th>CodeX</th>
+<th>Claude Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token性价比更高<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8205-1.jpg-w900.webp" alt="差异05-1" width="1263" height="1158" loading="lazy" decoding="async" data-fullsrc="差异05-1.jpg.png" fetchpriority="low"></td>
+<td>比较费token<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8205-2.jpg-w900.webp" alt="差异05-2" width="1299" height="1158" loading="lazy" decoding="async" data-fullsrc="差异05-2.jpg.png" fetchpriority="low"></td>
+</tr>
+<tr>
+<td>桌面端产品的联通性体验很好，有 all in one 的感觉，大大减少了用户从 A 模型迁移到 B 模型的成本，提升了对该工具台的好感度<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8205-3.jpg-w900.webp" alt="差异05-3" width="1263" height="1158" loading="lazy" decoding="async" data-fullsrc="差异05-3.jpg.png" fetchpriority="low"></td>
+<td>有联通性，但桌面端更多是在强化 Claude App 作为主要的生态入口，反而会刻意弱化 IDE 的存在，希望桌面端产品能够直接代替 IDE，成为开发者的主入口<br><img class="detail-shot" src=".preview-cache/%E5%B7%AE%E5%BC%8205-4.jpg-w900.webp" alt="差异05-4" width="1299" height="1158" loading="lazy" decoding="async" data-fullsrc="差异05-4.jpg.png" fetchpriority="low"></td>
+</tr>
+<tr>
+<td>感觉调教感没有Claude code那么好<br>差异性05-5.jpg</td>
+<td>用的越多越懂你（很好调教）<br>差异性05-6.jpg</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="2222-cli端产品体验"><strong>2.2.2.2 CLI端产品体验</strong></h4>
+<div class="callout">
+<p class="summary-title">三家 CLI 产品的伙伴画像总结</p>
+<p><strong>Codex CLI</strong></p>
+<ul>
+<li>像一个“已经很懂事的高阶 copilot”</li>
+<li>开箱即用，上手快、过程省心、结果可用，缺点是想往深处调教时会感觉“够用但不够深”</li>
+<li>适合定制化要求较低，要求高效快速出不错结果的场景</li>
+</ul>
+<p><strong>Claude Code</strong></p>
+<ul>
+<li>像一个“可以被深度雇佣的工程同事”</li>
+<li>对开发者来说，它最突出的地方是可控制的细粒度很高，可编辑、可定制的空间也很大。你愿意花时间训练它、给它写规则、给它配子代理，它就会无限对齐你想要的样子</li>
+<li>适合面对复杂长任务或有高定制化需求的场景</li>
+</ul>
+<p><strong>Gemini CLI</strong></p>
+<ul>
+<li>像一个“开放、便宜、不藏心思的实习生”</li>
+<li>试错成本最低、规则可见度最高、生态最开放，“它现在到底在想什么”是这三家里最透明的</li>
+</ul>
+<p>相比于桌面端，CLI 差异化的体验主要体现在初次握手、任务测试、结果对焦、迭代沟通四个阶段，所以这一部分会主要针对这四个阶段来对比产品体验，重复的部分就不再赘述了。</p>
+</div>
+<h4 id="阶段一初次握手-2"><strong>🤝 阶段一：初次握手</strong></h4>
+<blockquote>
+<p><strong>产品目标</strong>：能快速读懂开发文档配置指令，迅速上手安装使用。
+<br><strong>伙伴画像</strong>：能立刻干活的成品同事，不需要先培训三天。</p>
+</blockquote>
+<p><strong>基本能力</strong>：</p>
+<p>三家都做到了"一行命令进入工作状态"——<code>codex</code> / <code>claude</code> / <code>gemini</code>，并且都在首启时给出最小可用的 onboarding（登录、模型选择、当前目录确认）。<code>AGENTS.md</code> / <code>CLAUDE.md</code> / <code>GEMINI.md</code> 三套指令文件的存在，也意味着它们都默认假设用户会"用一份文件来描述项目"，而不是依赖每次手动 prompt。</p>
+<p><strong>差异化竞争力</strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>🚀 <strong>Codex CLI</strong></th>
+<th>🛠 <strong>Claude Code</strong></th>
+<th>🌱 <strong>Gemini CLI</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>传递的感觉是："<strong>最顺手，产品化最完整</strong>" —— ChatGPT 账号登录或 API key，进场后界面非常克制，几乎只剩任务输入区，第一次用就能开始</td>
+<td>传递的感觉是："<strong>最硬核，配置面最广</strong>" —— 启动后能看到模式、token、状态、历史搜索等更多状态信息，新手会觉得稍重，但开发者一眼就能感受到"这是一个专业工具"</td>
+<td>传递的感觉是："<strong>最容易试，开源最透明</strong>" —— <code>npx</code> 就能跑，Google 登录还有免费 tier（60 req/min, 1000 req/day），仓库公开（Apache-2.0），开发者会有一种"放心试一下"的心理安全</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Codex CLI</th>
+<th>Claude Code</th>
+<th>Gemini CLI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>安装与首启门槛</td>
+<td>低，配套 ChatGPT 账号最顺</td>
+<td>中，概念多，需要花时间理解模式与权限</td>
+<td>极低，npx 直接跑，个人 Google 账号有免费额度</td>
+</tr>
+<tr>
+<td>首启后的视觉密度</td>
+<td>干净，主打"任务输入"</td>
+<td>信息密度大，主打"工作台"</td>
+<td>偏极简，主打"上手即试"</td>
+</tr>
+<tr>
+<td>默认人设传达</td>
+<td>已经很懂事的高阶 copilot</td>
+<td>严肃认真的开发代理平台</td>
+<td>开放、可改、低成本试错的搭档</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="阶段二任务测试-2"><strong>⏰ 阶段二：任务测试</strong></h4>
+<blockquote>
+<p><strong>产品目标</strong>：通过模型权限设置、过程透出、可中断的指令，让用户持续保持掌控感。
+<br><strong>伙伴画像</strong>：边界感清晰、过程透明、不擅自越权的可靠同事。</p>
+</blockquote>
+<p><strong>基本能力</strong>：</p>
+<ul>
+<li><strong>执行前</strong>：三家都支持显式的权限模式选择（只读 / 自动 / 全权），并在改文件、跑命令、联网等敏感动作上给出确认机制；</li>
+<li><strong>执行中</strong>：都支持流式输出过程、显示当前命令、显示生成 / 修改的 diff；</li>
+<li><strong>打断</strong>：都支持 Ctrl+C 中断、并保留已发生的副作用上下文。</li>
+</ul>
+<p><strong>差异化竞争力</strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>🟦 <strong>Codex CLI</strong>：更"省心"</th>
+<th>🟧 <strong>Claude Code</strong>：更"较真"</th>
+<th>🟩 <strong>Gemini CLI</strong>：更"自助"</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>三档式权限（Auto / Read-only / Full Access），把复杂的安全模型压成 3 个直觉选项；默认 Auto 时几乎不打扰，跑得很顺</td>
+<td>权限粒度最细 —— <code>allow</code> / <code>ask</code> / <code>deny</code> 三态规则可叠加 sandbox、network、filesystem 维度，每个动作都能被精确治理；并支持 hooks 在执行的关键点插入用户逻辑</td>
+<td>中间态 —— <code>default</code> / <code>auto_edit</code> / <code>plan</code> / <code>yolo</code> 四档模式让用户自己选风格；外加 Docker sandbox 提供更硬的隔离选项；checkpointing 让"过程可回退"成为常态</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Codex CLI</th>
+<th>Claude Code</th>
+<th>Gemini CLI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>权限模型粒度</td>
+<td>粗（3 档），但直觉</td>
+<td>最细（多维规则）</td>
+<td>中（4 档 + sandbox）</td>
+</tr>
+<tr>
+<td>执行过程透出</td>
+<td>简洁</td>
+<td>最详尽，subagent 拆分可见</td>
+<td>中等，但有 plan 模式专门可视化思考</td>
+</tr>
+<tr>
+<td>中断 / 介入设计</td>
+<td>Ctrl+C 即可，无副作用记录</td>
+<td>中断后保留完整 trace，便于复盘</td>
+<td>checkpointing 可回退到任意一步</td>
+</tr>
+<tr>
+<td>给开发者的"掌控感"</td>
+<td>"我让你做什么你就做什么"</td>
+<td>"我对你做的每一件事都有发言权"</td>
+<td>"你随时可以提议，我随时可以反悔"</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="阶段三结果对焦-2"><strong>🍎 阶段三：结果对焦</strong></h4>
+<blockquote>
+<p><strong>产品目标</strong>：CLI 场景下，"在场感"主要体现在留痕完整度、可观测性、是否便于纳入 CI 自动化流程。
+<br><strong>伙伴画像</strong>：交付得出、查得清、改得回的工程同事。</p>
+</blockquote>
+<p><strong>基本能力</strong>：</p>
+<p>三家都支持以 diff 形式呈现修改、支持非交互执行（headless）、支持把结果以 JSON 输出，便于和 CI / 脚本拼接。<code>codex exec --json --output-schema</code>、Claude Code 的 <code>-p</code> + <code>--output-format</code> + <code>--json-schema</code>、Gemini CLI 的 <code>-p</code> + <code>--output-format json/stream-json</code> 在功能上是同一类东西。</p>
+<p><strong>差异化竞争力</strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th><strong>Codex CLI</strong></th>
+<th><strong>Claude Code</strong></th>
+<th><strong>Gemini CLI</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>自动化 / CI 友好度</td>
+<td>强，schema 化输出适合 CI 流水线</td>
+<td>最强，多了 <code>--max-budget-usd</code>、<code>--agent</code> 等"工业化"参数</td>
+<td>强，stream-json + checkpointing 让长任务也能纳入流水线</td>
+</tr>
+<tr>
+<td>留痕颗粒度</td>
+<td>适中，结果导向，过程留痕略粗</td>
+<td>最精细，subagent / hooks / 预算消耗都有显式 trace</td>
+<td>中等，但 checkpointing 是天然的"任意时刻快照"</td>
+</tr>
+<tr>
+<td>交付物的"持续在场感"</td>
+<td>完成即等待下一指令，TA 像安静的副驾</td>
+<td>留下完整工作记录，TA 像有交班笔记的同事</td>
+<td>留下可回滚版本，TA 像帮你做了 git stash 的同事</td>
+</tr>
+<tr>
+<td>适合的工程化场景</td>
+<td>单仓修 bug、轻量 CI 集成</td>
+<td>重度自动化 / 企业级流水线</td>
+<td>学生项目、独立开发、低成本长任务</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="阶段四迭代沟通-2"><strong>🚧 阶段四：迭代沟通</strong></h4>
+<blockquote>
+<p><strong>产品目标</strong>：能围绕需求高效迭代，准确理解并稳定执行。
+<br><strong>伙伴画像</strong>：越合作越默契，边界感强，聪明但听话。</p>
+</blockquote>
+<p><strong>基本能力</strong>：</p>
+<p>三家都支持文件化的长期指令（<code>AGENTS.md</code> / <code>CLAUDE.md</code> / <code>GEMINI.md</code>）、都支持分层覆盖（项目级 / 用户级 / 全局级）、都允许在迭代中显式纠偏并写回记忆。</p>
+<p><strong>差异化竞争力</strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>🎯 <strong>Codex CLI</strong>：迭代靠"换说法 + 改一份文件"</th>
+<th>🧰 <strong>Claude Code</strong>：迭代靠"重塑生产线"</th>
+<th>🔍 <strong>Gemini CLI</strong>：迭代靠"看清它的脑子"</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AGENTS.md</code> 简单直接，不用特别费劲就能调到一个不错的效果；但如果你开始追求更细粒度的控制，就会觉得它的表现没有那么好</td>
+<td><code>CLAUDE.md</code> + <code>skills</code> + <code>subagents</code> + <code>hooks</code> 给了你非常高的细粒度控制权，几乎可以按自己的工作方式一点点把它调顺；代价是学习曲线更陡，但调教深度确实最好</td>
+<td><code>GEMINI.md</code> 分层加载 + <code>/memory show</code> 把它当前到底按什么规则做事摊开给你看，出了问题也更容易顺着往回查，很适合拿来 debug</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Codex CLI</th>
+<th>Claude Code</th>
+<th>Gemini CLI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>调教手段</td>
+<td>规则文件</td>
+<td>规则文件 + skills + subagents + hooks</td>
+<td>规则文件 + 分层记忆 + JIT context</td>
+</tr>
+<tr>
+<td>调教成本</td>
+<td>低</td>
+<td>高（一开始重，后续 ROI 高）</td>
+<td>中</td>
+</tr>
+<tr>
+<td>调教天花板</td>
+<td>中</td>
+<td>最高</td>
+<td>中高</td>
+</tr>
+<tr>
+<td>调试可见性（"它现在认为的规则是什么"）</td>
+<td>一般</td>
+<td>较好</td>
+<td>最好（<code>/memory show</code>）</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="23-商业模式对比"><strong>2.3 商业模式对比</strong></h3>
+<div class="callout">
+<p>📌 <strong>先说结论</strong>：本章分析了三款产品不同的订阅模式，总结了三种不同的商业模式：</p>
+<ul>
+<li><strong>CodeX</strong>：OpenAI 靠 Agent 拉动 GPT 生态产品的订阅盘子，面向本来就在用 ChatGPT 的开发者，用更高的 token 性价比和“加量不加价”的感觉去稳住续费、带动升级，核心策略是通过生态放大订阅价值。</li>
+<li><strong>Claude Code</strong>：Anthropic 则是将 Agent 做成面向深度用户的高价值订阅产品，面向愿意为复杂任务、深度协作和高可控性买单的重度用户；虽然 token 更贵，但对这批人来说效果也确实更好。总结来说核心策略是 Agent 能力做得更深度、更定制、更可控，把盈利点放在深度使用和高价值用户客单上。</li>
+<li><strong>Gemini CLI</strong>：Google 则是先靠低门槛的 playground 吸引用户，再慢慢做转化。它先让更多人进来试、先养成使用习惯，再把其中一部分用户往 Google AI Pro、Code Assist、Vertex AI 这些更高价值的服务里转，核心策略是先铺生态入口，再做后端转化。</li>
+</ul>
+</div>
+<h4 id="订阅模式对比"><strong>订阅模式对比</strong></h4>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th><strong>CodeX</strong></th>
+<th><strong>Claude Code</strong></th>
+<th><strong>Gemini CLI</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>核心定价档位</strong></td>
+<td>与 ChatGPT 订阅打通：Plus（$20/月）、Pro（$200/月）、Business、Enterprise；2026-04 改为按 API token 用量计费（积分制）</td>
+<td>Pro $20/月、Max 5x $100/月、Max 20x $200/月；Team 必须 Premium $100/seat/月；Enterprise 按 seat + token 单独计费</td>
+<td>免费档：个人 Google 账号 60 req/min, 1000 req/day；付费档：Google AI Pro / Ultra / Code Assist 订阅；Pay-as-you-go：Vertex AI / AI Studio API key</td>
+</tr>
+<tr>
+<td><strong>付费转化路径</strong></td>
+<td>单一入口：ChatGPT 订阅升级即可解锁 Codex 高额度；超额可购买 credits</td>
+<td>阶梯式：免费用户 → Pro → Max 5x → Max 20x → Team / Enterprise；每一档有清晰的额度倍数</td>
+<td>漏斗式：免费用户基数大 → Google AI Pro / Code Assist 升级 → 企业用户走 Vertex AI 按用量</td>
+</tr>
+<tr>
+<td><strong>token 消耗特点</strong></td>
+<td>在订阅内被"打包"，用户对 token 消耗的感知较弱；超额时才会感受到成本</td>
+<td><strong>最透明</strong> —— 5 小时滚动 token 预算让用户随时知道"还能跑多少"；CLI 端可设置 <code>--max-budget-usd</code> 主动卡预算</td>
+<td>免费档以请求数（而非 token）计费，1000 req/day 是硬上限；付费档按 token 计费但官方文档提供清晰额度分配</td>
+</tr>
+<tr>
+<td><strong>长期 ROI</strong></td>
+<td>已有 ChatGPT Plus / Pro 用户<strong>最划算</strong>——边际成本几乎为零；纯 Codex 用户性价比一般</td>
+<td>中高投入、中高产出 —— 重度用户 ROI 高（调教沉淀显著），轻度用户会觉得"贵了"</td>
+<td><strong>试错成本最低</strong> —— 免费 tier 足以覆盖大多数个人开发者日常；升级路径存在但非刚需</td>
+</tr>
+<tr>
+<td><strong>商业策略本质</strong></td>
+<td>"<strong>生态绑定</strong>" —— Agent 能力是 ChatGPT 生态的延伸</td>
+<td>"<strong>价值定价</strong>" —— 按"Agent 能托管多少任务"分档收费</td>
+<td>"<strong>开源获客</strong>" —— 用免费 + 透明换长期用户基数</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="三家模式的判断与启示"><strong>三家模式的判断与启示</strong></h4>
+<p><strong>CodeX 的“绑订阅”模式</strong>更适合已经有成熟订阅盘子的厂商，目标用户本质上是原本就在用 ChatGPT 的那批人。它的盈利点不在于单独把 Agent 卖多贵，而在于用 Agent 提升主订阅的续费率、用户时长和高阶套餐转化，让整个 ChatGPT 订阅盘子更稳、更值钱。</p>
+<p><strong>Claude Code 的“独立订阅”模式</strong>更适合把 Agent 当核心产品来做的公司，目标用户也更明确，就是愿意为生产力和可控性买单的开发者、团队和企业。它的盈利点是按更高价值的任务托管能力收费，用户越重度、越依赖、越深度嵌入流程，收入就越稳定。</p>
+<p><strong>Gemini CLI 的“开源 + 免费 tier”模式</strong>服务的是更广的开发者基数，尤其是学生、独立开发者，以及愿意先试再决定要不要付费的人。它短期看不一定靠 CLI 本身挣钱，但能把用户持续导向 Google AI Pro、Code Assist、Vertex AI 这些更高价值的产品，所以它真正的盈利点在生态后端，而不是前端这层工具本身。</p>
+<h3 id="24-还有哪些体验亮点"><strong>2.4 还有哪些体验亮点</strong></h3>
+<ul>
+<li><strong>CodeX 的 chronicle 录屏自动构建 AI 记忆</strong>：解决了"我做过的事 agent 不知道"的死循环，把用户的过往工作直接转成 agent 的上下文；</li>
+<li><strong>Claude Code 的 <code>/recap</code></strong>：每次回到会话先帮你"小结之前发生了什么"，跨时段连续性体验最好；</li>
+<li><strong>Claude Code 的 hooks</strong>：让用户能在 agent 执行的关键点插入自己的逻辑，是"调教 agent 工作方式"而非"调 prompt"的关键能力；</li>
+<li><strong>Gemini CLI 的 <code>/memory show</code></strong>：把 agent 当前认为的规则透明可见地展示出来，是这三家里最适合 debug "agent 为什么这么做"的设计；</li>
+<li><strong>Gemini CLI 的 checkpointing</strong>：让"持续可回滚"成为日常默认，让长任务的探索成本极低。</li>
+</ul>
+<h2 id="3-小结"><strong>3. 小结</strong></h2>
+
+      </article>
+      <div class="footer-note">Generated from Final版本_统一排版版.md</div>
+    </main>
+    <aside class="toc" id="doc-toc">
+<a class="toc-link level-2" href="#引言">💡 引言</a>
+<a class="toc-link level-2" href="#1核心竞品选择">1、核心竞品选择</a>
+<a class="toc-link level-3" href="#11-agent产品概览">1.1 Agent产品概览</a>
+<a class="toc-link level-3" href="#12-选择最合适的核心竞品">1.2 选择最合适的核心竞品</a>
+<a class="toc-link level-2" href="#2核心竞品分析">2、核心竞品分析</a>
+<a class="toc-link level-3" href="#21-产品战略对比">2.1 产品战略对比</a>
+<a class="toc-link level-4" href="#221-差异化选择体现的三个agent的护城河方向">2.2.1. 差异化选择体现的三个Agent的“护城河方向”</a>
+<a class="toc-link level-4" href="#212-共性趋势下agent演化方向的三个重要轴线">2.1.2. 共性趋势下Agent演化方向的三个重要轴线</a>
+<a class="toc-link level-3" href="#22-产品体验对比">2.2 产品体验对比</a>
+<a class="toc-link level-4" href="#221-分析框架">2.2.1. 分析框架</a>
+<a class="toc-link level-4" href="#222-分析实例">2.2.2. 分析实例</a>
+<a class="toc-link level-4 toc-link-nested" href="#2221-桌面端产品体验">2.2.2.1 桌面端产品体验</a>
+<a class="toc-link level-4 toc-link-nested" href="#2222-cli端产品体验">2.2.2.2 CLI端产品体验</a>
+<a class="toc-link level-3" href="#23-商业模式对比">2.3 商业模式对比</a>
+<a class="toc-link level-3" href="#24-还有哪些体验亮点">2.4 还有哪些体验亮点</a>
+<a class="toc-link level-2" href="#3-小结">3. 小结</a>
+    </aside>
+  </div>
+  <script>
+    const body = document.body;
+    const menuButton = document.querySelector('.menu-button');
+    const backdrop = document.querySelector('.toc-backdrop');
+    const tocLinks = document.querySelectorAll('.toc-link');
+    const articleImages = document.querySelectorAll('.article img');
+    const lightbox = document.querySelector('.image-lightbox');
+    const lightboxImage = lightbox.querySelector('img');
+    const lightboxClose = lightbox.querySelector('.image-lightbox-close');
+    const zoomInButton = lightbox.querySelector('.image-lightbox-zoom-in');
+    const zoomOutButton = lightbox.querySelector('.image-lightbox-zoom-out');
+    const zoomResetButton = lightbox.querySelector('.image-lightbox-zoom-reset');
+    const zoomLabel = lightbox.querySelector('.image-lightbox-zoom-label');
+    let lightboxScale = 1;
+
+    function updateLightboxZoom() {
+      lightboxImage.style.transform = `scale(${lightboxScale})`;
+      zoomLabel.textContent = `${Math.round(lightboxScale * 100)}%`;
+    }
+
+    function setLightboxZoom(nextScale) {
+      lightboxScale = Math.min(4, Math.max(0.5, nextScale));
+      updateLightboxZoom();
+    }
+
+    function closeNav() {
+      body.classList.remove('nav-open');
+      menuButton.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleNav() {
+      const willOpen = !body.classList.contains('nav-open');
+      body.classList.toggle('nav-open', willOpen);
+      menuButton.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    }
+
+    menuButton.addEventListener('click', toggleNav);
+    backdrop.addEventListener('click', closeNav);
+    tocLinks.forEach((link) => {
+      link.addEventListener('click', closeNav);
+    });
+    function openLightbox(image) {
+      lightboxImage.src = image.getAttribute('data-fullsrc') || image.getAttribute('src') || '';
+      lightboxImage.alt = image.getAttribute('alt') || '';
+      lightboxScale = 1;
+      updateLightboxZoom();
+      lightbox.classList.add('is-open');
+      lightbox.setAttribute('aria-hidden', 'false');
+      body.classList.add('lightbox-open');
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('is-open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      lightboxImage.src = '';
+      lightboxImage.alt = '';
+      lightboxScale = 1;
+      updateLightboxZoom();
+      body.classList.remove('lightbox-open');
+    }
+
+    articleImages.forEach((image) => {
+      image.addEventListener('click', () => openLightbox(image));
+    });
+
+    function alignDetailShotRows() {
+      document.querySelectorAll('.article table tr').forEach((row) => {
+        const images = Array.from(row.querySelectorAll('td img.detail-shot'));
+        if (images.length < 2) return;
+        images.forEach((image) => {
+          image.style.marginTop = '12px';
+        });
+        const offsets = images.map((image) => image.getBoundingClientRect().top);
+        const maxOffset = Math.max(...offsets);
+        images.forEach((image, index) => {
+          const delta = maxOffset - offsets[index];
+          if (delta > 1) {
+            image.style.marginTop = `${12 + delta}px`;
+          }
+        });
+      });
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    zoomInButton.addEventListener('click', () => setLightboxZoom(lightboxScale + 0.25));
+    zoomOutButton.addEventListener('click', () => setLightboxZoom(lightboxScale - 0.25));
+    zoomResetButton.addEventListener('click', () => setLightboxZoom(1));
+    lightboxImage.addEventListener('dblclick', () => setLightboxZoom(1));
+    lightbox.addEventListener('wheel', (event) => {
+      if (!lightbox.classList.contains('is-open')) return;
+      event.preventDefault();
+      const delta = event.deltaY < 0 ? 0.2 : -0.2;
+      setLightboxZoom(lightboxScale + delta);
+    }, { passive: false });
+    lightbox.addEventListener('click', (event) => {
+      if (event.target === lightbox) closeLightbox();
+    });
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeNav();
+      if (event.key === 'Escape' && lightbox.classList.contains('is-open')) closeLightbox();
+    });
+    window.addEventListener('load', alignDetailShotRows);
+    window.addEventListener('resize', alignDetailShotRows);
+  </script>
+</body>
+</html>

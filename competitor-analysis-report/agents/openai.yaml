@@ -1,0 +1,5 @@
+version: 1
+interface:
+  display_name: 竞品分析报告
+  short_description: 用时间轴、共性差异和关系设计视角产出高质量竞品分析
+  default_prompt: 帮我按这个 skill 的方法做一份竞品分析，先筛核心竞品，再做时间轴、共性差异、战略体验商业模式三层分析，最后写成有判断的报告。
