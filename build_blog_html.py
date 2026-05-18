@@ -198,11 +198,15 @@ def build_deploy_bundle() -> None:
 
 def postprocess_article_html(html_body: str) -> str:
     root = lxml_html.fragment_fromstring(html_body, create_parent="div")
+    for heading in root.xpath(".//h4"):
+        if _node_text(heading).strip().startswith("阶段"):
+            _add_class(heading, "stage-heading")
     tables = root.xpath(".//table")
 
     for table in tables:
         first_header_nodes = table.xpath("./thead/tr[1]/th[1]")
         first_header_text = _node_text(first_header_nodes[0]) if first_header_nodes else ""
+        first_header_text_compact = first_header_text.replace(" ", "")
 
         if first_header_text.startswith("1️⃣ DeepSeek 本身") or first_header_text.startswith("1️⃣ OpenAI Codex 更像"):
             _add_class(table, "plain-list-table")
@@ -213,15 +217,55 @@ def postprocess_article_html(html_body: str) -> str:
         header_texts = [_node_text(cell).strip() for cell in header_cells]
         if header_texts == ["CodeX", "Claude Code"]:
             _add_class(table, "equal-two-col-table")
+        elif len(header_texts) == 2 and first_header_text not in {"分类", "维度"}:
+            _add_class(table, "equal-two-col-table")
+        elif not header_texts:
+            first_row_cells = table.xpath("./tbody/tr[1]/td|./tbody/tr[1]/th")
+            if len(first_row_cells) == 2:
+                _add_class(table, "equal-two-col-table")
+        if first_header_text == "分类":
+            _add_class(table, "category-stack-table")
+        if first_header_text == "维度":
+            _add_class(table, "dimension-compare-table")
+        if first_header_text == "关系阶段":
+            _add_class(table, "relationship-stage-table")
 
-        if first_header_text.startswith("共性趋势1｜更联通") or first_header_text.startswith("共性趋势2｜更懂我") or first_header_text.startswith("共性趋势3｜更靠谱"):
+        if "equal-two-col-table" in (table.get("class", "") or "").split():
+            for row in table.xpath("./tbody/tr"):
+                cells = row.xpath("./td|./th")
+                if len(cells) != 2:
+                    continue
+                is_emphasis_row = True
+                for cell in cells:
+                    non_empty_children = [
+                        child for child in cell
+                        if isinstance(getattr(child, "tag", None), str)
+                    ]
+                    cell_text = (cell.text or "").strip()
+                    tail_text = "".join((child.tail or "") for child in non_empty_children).strip()
+                    if cell_text or tail_text or len(non_empty_children) != 1 or non_empty_children[0].tag != "strong":
+                        is_emphasis_row = False
+                        break
+                if is_emphasis_row:
+                    _add_class(row, "emphasis-row")
+
+        if (
+            first_header_text_compact.startswith("共性趋势1｜更联通")
+            or first_header_text_compact.startswith("共性趋势2｜更懂我")
+            or first_header_text_compact.startswith("共性趋势3｜更靠谱")
+        ):
             _add_class(table, "trend-table")
             for row in table.xpath("./tbody/tr"):
                 cells = row.xpath("./td|./th")
                 if not cells:
                     continue
                 first_cell_text = _node_text(cells[0])
-                if first_cell_text.startswith("💆 用户体验") or first_cell_text.startswith("🙋 用户体验") or first_cell_text.startswith("👤 用户体验"):
+                if len(cells) >= 3 and not _node_text(cells[1]) and not _node_text(cells[2]):
+                    cells[0].set("colspan", str(len(cells)))
+                    for extra in cells[1:]:
+                        extra.getparent().remove(extra)
+                    continue
+                if first_cell_text.startswith("🧒 用户体验") or first_cell_text.startswith("💆 用户体验") or first_cell_text.startswith("🙋 用户体验") or first_cell_text.startswith("👤 用户体验"):
                     cells[0].set("colspan", str(len(cells)))
                     for extra in cells[1:]:
                         extra.getparent().remove(extra)
@@ -267,7 +311,7 @@ def postprocess_article_html(html_body: str) -> str:
 
 def build_toc(headings: list[dict]) -> str:
     hidden_keywords = ("阶段一", "阶段二", "阶段三", "阶段四", "阶段五")
-    hidden_titles = {"订阅模式对比", "三家模式的判断与启示"}
+    hidden_titles = {"订阅模式对比", "模式的判断与启示"}
     blocks = []
     for item in headings:
         if any(keyword in item["plain"] for keyword in hidden_keywords):
@@ -275,8 +319,9 @@ def build_toc(headings: list[dict]) -> str:
         if item["plain"] in hidden_titles:
             continue
         extra_class = " toc-link-nested" if item["plain"].startswith(("2.2.2.1", "2.2.2.2")) else ""
+        label = item["plain"]
         blocks.append(
-            f'<a class="toc-link level-{item["level"]}{extra_class}" href="#{html.escape(item["slug"], quote=True)}">{html.escape(item["plain"])}</a>'
+            f'<a class="toc-link level-{item["level"]}{extra_class}" href="#{html.escape(item["slug"], quote=True)}">{html.escape(label)}</a>'
         )
     return "\n".join(blocks)
 
@@ -294,17 +339,18 @@ def build_page(article_html: str, toc_html: str) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Agent 竞品调研</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     :root {{
       --bg: #ffffff;
       --paper: #ffffff;
-      --text: #242424;
-      --muted: #6b6b6b;
-      --line: #e6e6e6;
-      --accent: #1a8917;
-      --accent-soft: #f6f7f4;
-      --quote-bg: #fafafa;
-      --sans: sohne, "Helvetica Neue", Helvetica, Arial, sans-serif;
-      --serif: charter, "Bitstream Charter", "Sitka Text", Cambria, serif;
+      --text: #171717;
+      --muted: #666666;
+      --line: #e7e5e4;
+      --accent: #111111;
+      --accent-soft: #f6f5f2;
+      --quote-bg: #fafaf9;
+      --sans: "Inter", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+      --serif: "Inter", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
     }}
     * {{
       box-sizing: border-box;
@@ -316,81 +362,38 @@ def build_page(article_html: str, toc_html: str) -> str:
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      font-family: var(--serif);
+      font-family: var(--sans);
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }}
-    .menu-button {{
-      position: fixed;
-      left: 24px;
-      top: 24px;
-      z-index: 30;
-      border: 1px solid rgba(0,0,0,.06);
-      border-radius: 999px;
-      padding: 12px 18px;
-      background: rgba(255,255,255,.96);
-      color: #191919;
-      box-shadow: 0 2px 10px rgba(0,0,0,.06);
-      backdrop-filter: blur(8px);
-      font: 600 14px/1 var(--sans);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }}
-    .menu-button:hover {{
-      background: #fdfdfd;
-    }}
     .layout {{
-      max-width: 1400px;
+      max-width: 1480px;
       margin: 0 auto;
-      padding: 36px 24px 96px;
+      padding: 32px 28px 96px;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      column-gap: 56px;
+      align-items: start;
     }}
     .main {{
       min-width: 0;
+      grid-column: 2;
     }}
     .hero {{
-      max-width: 920px;
-      margin: 0 auto 40px;
-      padding-top: 52px;
+      max-width: 860px;
+      margin: 0 0 48px;
+      padding-top: 32px;
     }}
     .hero h1 {{
       margin: 0 0 18px;
-      font-size: 68px;
+      font-size: 64px;
       line-height: 1.02;
-      letter-spacing: -0.045em;
-      font-weight: 700;
-    }}
-    .hero .byline {{
-      margin: 0;
-      max-width: 840px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--muted);
-      font: 400 13px/1.5 var(--sans);
-      letter-spacing: .01em;
-    }}
-    .hero .byline::before {{
-      content: "";
-      width: 28px;
-      height: 1px;
-      background: #d8d8d8;
-      display: inline-block;
-    }}
-    .hero .byline-author {{
-      color: #191919;
-      font-weight: 600;
-    }}
-    .hero .byline-separator {{
-      color: #b0b0b0;
-    }}
-    .hero .byline-date {{
-      color: #7a7a7a;
+      letter-spacing: -0.05em;
+      font-weight: 800;
     }}
     .article {{
-      max-width: 920px;
-      margin: 0 auto;
+      max-width: 860px;
+      margin: 0;
       padding: 0;
       background: transparent;
       border: 0;
@@ -401,8 +404,8 @@ def build_page(article_html: str, toc_html: str) -> str:
     .article h2,
     .article h3,
     .article h4 {{
-      margin: 2.15em 0 .72em;
-      line-height: 1.22;
+      margin: 40px 0 16px;
+      line-height: 1.4;
       font-weight: 700;
       scroll-margin-top: 24px;
       color: #191919;
@@ -411,38 +414,71 @@ def build_page(article_html: str, toc_html: str) -> str:
       margin-top: 0;
     }}
     .article h2 {{
-      font-size: 38px;
-      letter-spacing: -0.02em;
+      margin-top: 50px;
+      font-size: 28px;
+      letter-spacing: -0.018em;
     }}
     .article h3 {{
-      font-size: 29px;
-      letter-spacing: -0.015em;
+      font-size: 24px;
+      letter-spacing: -0.014em;
     }}
     .article h4 {{
-      font-size: 22px;
+      font-size: 20px;
+      letter-spacing: -0.01em;
+    }}
+    .article h4.stage-heading {{
+      font-size: 16px;
+      line-height: 1.5;
+      font-weight: 700;
+      letter-spacing: 0;
+      margin-top: 32px;
+    }}
+    .article h5,
+    .article h6 {{
+      margin: 28px 0 14px;
+      font-size: 20px;
+      line-height: 1.4;
+      font-weight: 700;
+      color: #191919;
       letter-spacing: -0.01em;
     }}
     .article p,
     .article li {{
-      font-size: 20px;
-      line-height: 1.72;
+      font-size: 16px;
+      line-height: 1.8;
       color: var(--text);
     }}
+    .article p.appendix-group-title {{
+      margin: 18px 0 8px;
+      font-size: 14px;
+      line-height: 1.6;
+      font-weight: 600;
+      color: #2f2f2f;
+    }}
     .article p {{
-      margin: 0 0 .95em;
+      margin: 0 0 22px;
+    }}
+    .article p.table-caption,
+    .article p.figure-caption {{
+      margin-top: 8px;
     }}
     .article ul,
     .article ol {{
-      margin: 0 0 1.1em 1.22em;
+      margin: 0 0 16px 1.22em;
       padding: 0;
     }}
+    .article ol {{
+      list-style: none;
+      margin-left: 0;
+      padding-left: 0;
+    }}
     .article li + li {{
-      margin-top: .22em;
+      margin-top: 6px;
     }}
     .article hr {{
       border: 0;
       border-top: 1px solid var(--line);
-      margin: 2.8em 0;
+      margin: 36px 0;
     }}
     .article strong {{
       font-weight: 700;
@@ -491,21 +527,27 @@ def build_page(article_html: str, toc_html: str) -> str:
       }}
     }}
     .article blockquote {{
-      margin: 1.7em 0;
-      padding: 0 0 0 22px;
+      margin: 20px 0;
+      padding: 0 0 0 18px;
       background: transparent;
-      border-left: 3px solid #d8d8d8;
+      border-left: 2px solid #d6d3d1;
       border-radius: 0;
     }}
     .article blockquote p:last-child {{
       margin-bottom: 0;
     }}
+    .article blockquote p,
+    .article blockquote li {{
+      font-size: 15px;
+      line-height: 1.8;
+    }}
     .callout {{
-      margin: 1.7em 0 2em;
-      padding: 18px 20px;
+      margin: 24px 0 28px;
+      padding: 16px 18px;
       background: var(--accent-soft);
-      border-left: 3px solid #d9d9d9;
-      border-radius: 4px;
+      border: 1px solid #ece9e2;
+      border-left: 2px solid #d6d3d1;
+      border-radius: 10px;
     }}
     .callout p:last-child,
     .callout ul:last-child,
@@ -516,20 +558,26 @@ def build_page(article_html: str, toc_html: str) -> str:
     .callout li,
     .callout p em,
     .callout li em {{
-      font-size: 16px;
-      line-height: 1.7;
+      font-size: 15px;
+      line-height: 1.75;
       font-style: normal;
     }}
     .summary-title {{
-      margin: 1.35em 0 .55em;
-      font: 700 18px/1.5 var(--serif);
+      margin: 0 0 10px;
+      font: 700 16px/1.6 var(--sans);
       color: #191919;
       letter-spacing: -0.01em;
+    }}
+    .table-caption {{
+      margin: 8px 0 0;
+      text-align: center;
+      color: #8a8f98;
+      font: 400 10px/1.6 var(--sans);
     }}
     .table-wrap {{
       width: 100%;
       overflow-x: auto;
-      margin: 1.35em 0 1.9em;
+      margin: 18px 0 6px;
       background: transparent;
       border: 1px solid var(--line);
       border-radius: 0;
@@ -541,21 +589,22 @@ def build_page(article_html: str, toc_html: str) -> str:
       min-width: 620px;
       border-collapse: collapse;
       font-size: 13px;
+      background: #fff;
     }}
     .article th,
     .article td {{
-      padding: 15px 14px;
+      padding: 14px 14px;
       border-bottom: 1px solid var(--line);
       text-align: left;
       vertical-align: top;
-      line-height: 1.75;
+      line-height: 1.7;
       word-break: break-word;
       white-space: normal;
       font-size: 14px;
     }}
     .article th {{
-      background: #fafafa;
-      font: 700 13px/1.6 var(--sans);
+      background: #fafaf9;
+      font: 700 14px/1.6 var(--sans);
       color: #191919;
     }}
     .plain-list-table thead td,
@@ -575,19 +624,64 @@ def build_page(article_html: str, toc_html: str) -> str:
     .equal-two-col-table td {{
       width: 50%;
     }}
+    .equal-two-col-table tbody:first-child tr:first-child td,
+    .equal-two-col-table tbody:first-child tr:first-child th {{
+      font-weight: 400;
+      color: #191919;
+      background: #fff;
+    }}
+    .equal-two-col-table tr.emphasis-row td,
+    .equal-two-col-table tr.emphasis-row th {{
+      background: #f6f6f3;
+    }}
+    .category-stack-table {{
+      table-layout: fixed;
+    }}
+    .category-stack-table th:first-child,
+    .category-stack-table td:first-child {{
+      width: 24%;
+    }}
+    .dimension-compare-table {{
+      table-layout: fixed;
+    }}
+    .dimension-compare-table th:first-child,
+    .dimension-compare-table td:first-child {{
+      width: 18%;
+    }}
+    .trend-table thead th:first-child,
+    .trend-table thead th:first-child strong {{
+      font-size: 15px;
+      line-height: 1.55;
+    }}
+    .trend-table tbody tr:nth-child(1) strong,
+    .trend-table tbody tr:nth-child(3) strong {{
+      font-weight: 400;
+    }}
     .trend-table td:first-child {{
       white-space: normal;
     }}
     .trend-table tbody tr:nth-child(1) td:first-child,
     .trend-table tbody tr:nth-child(3) td:first-child {{
-      font: 700 15px/1.55 var(--sans);
+      font: 400 15px/1.55 var(--sans);
       color: #191919;
     }}
     .trend-table tbody tr:nth-child(1) td:nth-child(2) {{
-      font: 700 15px/1.55 var(--sans);
+      font: 400 15px/1.55 var(--sans);
       color: #191919;
     }}
+    .trend-table tbody tr:nth-child(2) td:nth-child(1),
+    .trend-table tbody tr:nth-child(2) td:nth-child(2),
+    .trend-table tbody tr:nth-child(3) td:first-child,
+    .trend-table tbody tr:nth-child(3) td:nth-child(2) {{
+      width: 50%;
+      vertical-align: top;
+      white-space: normal;
+    }}
     .trend-table td[colspan] {{
+      width: 100%;
+    }}
+    .trend-table tbody tr:nth-child(2) td:first-child:only-child {{
+      display: block;
       width: 100%;
     }}
     .trend-table tbody tr:nth-child(4) td[colspan] {{
@@ -610,50 +704,69 @@ def build_page(article_html: str, toc_html: str) -> str:
       table-layout: fixed;
     }}
     .analysis-framework-table col.analysis-col-journey {{
-      width: 126px;
+      width: 56px;
     }}
     .analysis-framework-table col.analysis-col-equal {{
-      width: calc((100% - 126px) / 5);
+      width: calc((100% - 56px) / 5);
+    }}
+    .analysis-framework-table th {{
+      text-align: center;
+      vertical-align: middle;
+    }}
+    .analysis-framework-table th:first-child {{
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      letter-spacing: 0.08em;
+      width: 56px;
+      min-width: 56px;
+      padding: 14px 6px;
+    }}
+    .relationship-stage-table {{
+      table-layout: fixed;
+    }}
+    .relationship-stage-table th:first-child,
+    .relationship-stage-table td:first-child {{
+      width: 18%;
+      white-space: nowrap;
+    }}
+    .article h5 strong,
+    .article h6 strong {{
+      font-size: 20px;
+      font-weight: 700;
+    }}
+    .article h5,
+    .article h6,
+    .article h5 strong,
+    .article h6 strong {{
+      font-size: 20px;
+      line-height: 1.5;
     }}
     .article tr:last-child td {{
       border-bottom: 0;
     }}
     .toc {{
       position: fixed;
-      left: 18px;
-      top: 64px;
-      bottom: 18px;
-      width: 460px;
-      z-index: 28;
-      padding: 18px 16px 18px;
-      background: rgba(255,255,255,0.98);
-      border: 1px solid rgba(0,0,0,.07);
-      border-radius: 16px;
-      box-shadow: 0 10px 28px rgba(0,0,0,.08);
-      backdrop-filter: blur(12px);
+      top: 50vh;
+      left: max(28px, calc(50vw - 740px + 28px));
+      transform: translateY(-50%);
+      width: 260px;
+      max-height: calc(100vh - 96px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
+      padding: 8px 0;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
       overflow-y: auto;
-      transform: translateX(calc(-100% - 24px));
-      opacity: 0;
-      pointer-events: none;
-      transition: transform .24s ease, opacity .24s ease;
+      z-index: 10;
     }}
-    body.nav-open .toc {{
-      transform: translateX(0);
-      opacity: 1;
-      pointer-events: auto;
-    }}
-    .toc-backdrop {{
-      position: fixed;
-      inset: 0;
-      z-index: 24;
-      background: rgba(20, 16, 12, 0.18);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .24s ease;
-    }}
-    body.nav-open .toc-backdrop {{
-      opacity: 1;
-      pointer-events: auto;
+    .toc-links {{
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }}
     .image-lightbox {{
       position: fixed;
@@ -733,107 +846,115 @@ def build_page(article_html: str, toc_html: str) -> str:
       overflow: hidden;
     }}
     .toc-title {{
-      margin: 0 0 14px;
-      color: #191919;
-      font: 700 16px/1.4 var(--sans);
-      letter-spacing: .02em;
+      margin: 0;
+      color: #8a8f98;
+      font: 700 12px/1.4 var(--sans);
+      letter-spacing: .08em;
+      text-transform: uppercase;
     }}
     .toc-link {{
       display: block;
       width: 100%;
       box-sizing: border-box;
-      padding: 8px 0 8px 12px;
-      border-left: 2px solid transparent;
-      color: #4b4b4b;
+      padding: 6px 0 6px 14px;
+      border-left: 1px solid transparent;
+      color: #9aa0a9;
       text-decoration: none;
-      font: 500 13px/1.5 var(--sans);
+      font: 500 12px/1.45 var(--sans);
       overflow-wrap: anywhere;
       transition: color .18s ease, border-color .18s ease;
     }}
     .toc-link:hover {{
+      color: #4b5563;
+      border-left-color: #c7cbd1;
+    }}
+    .toc-link.is-active {{
       color: #191919;
       border-left-color: #191919;
+      font-weight: 600;
+      background: linear-gradient(90deg, rgba(23, 23, 23, 0.04) 0%, rgba(23, 23, 23, 0) 100%);
     }}
     .toc-link.level-3 {{
-      padding-left: 30px;
+      padding-left: 24px;
     }}
     .toc-link.level-4 {{
-      padding-left: 52px;
+      padding-left: 38px;
       white-space: normal;
       overflow: visible;
       text-overflow: clip;
     }}
     .toc-link.toc-link-nested {{
-      padding-left: 74px;
+      padding-left: 50px;
     }}
     .footer-note {{
       max-width: 860px;
-      margin: 36px auto 0;
+      margin: 36px 0 0;
       text-align: center;
       color: #8a8a8a;
       font: 400 12px/1.5 var(--sans);
     }}
     @media (max-width: 1100px) {{
       .layout {{
+        grid-template-columns: 220px minmax(0, 1fr);
+        column-gap: 24px;
         padding-inline: 18px;
       }}
       .hero,
       .article,
       .footer-note {{
-        max-width: 780px;
+        max-width: 760px;
       }}
       .hero h1 {{
-        font-size: 56px;
+        font-size: 52px;
       }}
       .article p,
       .article li {{
-        font-size: 18px;
+        font-size: 16px;
       }}
     }}
     @media (max-width: 768px) {{
       .layout {{
+        display: block;
         padding: 20px 14px 56px;
       }}
-      .menu-button {{
-        left: 14px;
-        top: 14px;
-        padding: 10px 16px;
-        font-size: 13px;
-      }}
       .toc {{
-        left: 12px;
-        right: 12px;
+        position: static;
+        left: auto;
+        transform: none;
         width: auto;
-        top: 58px;
-        bottom: 12px;
+        display: block;
+        max-height: none;
+        margin: 0 0 24px;
+      }}
+      .toc-links {{
+        display: block;
       }}
       .hero h1 {{
-        font-size: 40px;
-        letter-spacing: -0.035em;
-      }}
-      .hero .byline {{
-        font-size: 13px;
+        font-size: 38px;
+        letter-spacing: -0.04em;
       }}
       .article h2 {{
-        font-size: 30px;
+        font-size: 28px;
       }}
       .article h3 {{
-        font-size: 25px;
+        font-size: 24px;
       }}
       .article h4 {{
         font-size: 20px;
       }}
+      .article h5,
+      .article h6 {{
+        font-size: 20px;
+      }}
       .article p,
       .article li {{
-        font-size: 18px;
-        line-height: 1.68;
+        font-size: 16px;
+        line-height: 1.78;
       }}
     }}
   </style>
 </head>
 <body>
-  <button class="menu-button" type="button" aria-expanded="false" aria-controls="doc-toc">☰ <span>目录</span></button>
-  <div class="toc-backdrop"></div>
   <div class="image-lightbox" aria-hidden="true">
     <div class="image-lightbox-toolbar">
       <button class="image-lightbox-zoom-out" type="button" aria-label="缩小图片">−</button>
@@ -845,25 +966,24 @@ def build_page(article_html: str, toc_html: str) -> str:
     <img src="" alt="" />
   </div>
   <div class="layout">
+    <aside class="toc" id="doc-toc">
+      <div class="toc-title">目录</div>
+      <nav class="toc-links">
+{toc_html}
+      </nav>
+    </aside>
     <main class="main">
       <header class="hero">
         <h1>Agent 竞品调研</h1>
-        <p class="byline"><span class="byline-author">Echo</span><span class="byline-separator">·</span><span class="byline-date">2026.5.12</span></p>
       </header>
       <article class="article">
 {article_html}
       </article>
       <div class="footer-note">Generated from Final版本_统一排版版.md</div>
     </main>
-    <aside class="toc" id="doc-toc">
-{toc_html}
-    </aside>
   </div>
   <script>
     const body = document.body;
-    const menuButton = document.querySelector('.menu-button');
-    const backdrop = document.querySelector('.toc-backdrop');
-    const tocLinks = document.querySelectorAll('.toc-link');
     const articleImages = document.querySelectorAll('.article img');
     const lightbox = document.querySelector('.image-lightbox');
     const lightboxImage = lightbox.querySelector('img');
@@ -872,6 +992,17 @@ def build_page(article_html: str, toc_html: str) -> str:
     const zoomOutButton = lightbox.querySelector('.image-lightbox-zoom-out');
     const zoomResetButton = lightbox.querySelector('.image-lightbox-zoom-reset');
     const zoomLabel = lightbox.querySelector('.image-lightbox-zoom-label');
+    const tocLinks = Array.from(document.querySelectorAll('#doc-toc .toc-link'));
+    const observedHeadings = tocLinks
+      .map((link) => {{
+        const href = link.getAttribute('href') || '';
+        if (!href.startsWith('#')) return null;
+        const targetId = decodeURIComponent(href.slice(1));
+        const target = document.getElementById(targetId);
+        if (!target) return null;
+        return {{ link, target }};
+      }})
+      .filter(Boolean);
     let lightboxScale = 1;
 
     function updateLightboxZoom() {{
@@ -883,23 +1014,6 @@ def build_page(article_html: str, toc_html: str) -> str:
       lightboxScale = Math.min(4, Math.max(0.5, nextScale));
       updateLightboxZoom();
     }}
-
-    function closeNav() {{
-      body.classList.remove('nav-open');
-      menuButton.setAttribute('aria-expanded', 'false');
-    }}
-
-    function toggleNav() {{
-      const willOpen = !body.classList.contains('nav-open');
-      body.classList.toggle('nav-open', willOpen);
-      menuButton.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-    }}
-
-    menuButton.addEventListener('click', toggleNav);
-    backdrop.addEventListener('click', closeNav);
-    tocLinks.forEach((link) => {{
-      link.addEventListener('click', closeNav);
-    }});
     function openLightbox(image) {{
       lightboxImage.src = image.getAttribute('data-fullsrc') || image.getAttribute('src') || '';
       lightboxImage.alt = image.getAttribute('alt') || '';
@@ -942,6 +1056,34 @@ def build_page(article_html: str, toc_html: str) -> str:
       }});
     }}
 
+    function setActiveTocLink(activeLink) {{
+      tocLinks.forEach((link) => link.classList.remove('is-active'));
+      if (activeLink) {{
+        activeLink.classList.add('is-active');
+      }}
+    }}
+
+    function updateActiveTocLink() {{
+      if (!observedHeadings.length) return;
+      const scrollAnchor = window.innerHeight * 0.22;
+      let current = observedHeadings[0];
+
+      observedHeadings.forEach((item) => {{
+        const top = item.target.getBoundingClientRect().top;
+        if (top - scrollAnchor <= 0) {{
+          current = item;
+        }}
+      }});
+
+      setActiveTocLink(current.link);
+    }}
+
+    tocLinks.forEach((link) => {{
+      link.addEventListener('click', () => {{
+        setActiveTocLink(link);
+      }});
+    }});
+
     lightboxClose.addEventListener('click', closeLightbox);
     zoomInButton.addEventListener('click', () => setLightboxZoom(lightboxScale + 0.25));
     zoomOutButton.addEventListener('click', () => setLightboxZoom(lightboxScale - 0.25));
@@ -957,11 +1099,17 @@ def build_page(article_html: str, toc_html: str) -> str:
       if (event.target === lightbox) closeLightbox();
     }});
     window.addEventListener('keydown', (event) => {{
-      if (event.key === 'Escape') closeNav();
       if (event.key === 'Escape' && lightbox.classList.contains('is-open')) closeLightbox();
     }});
-    window.addEventListener('load', alignDetailShotRows);
-    window.addEventListener('resize', alignDetailShotRows);
+    window.addEventListener('load', () => {{
+      alignDetailShotRows();
+      updateActiveTocLink();
+    }});
+    window.addEventListener('resize', () => {{
+      alignDetailShotRows();
+      updateActiveTocLink();
+    }});
+    window.addEventListener('scroll', updateActiveTocLink, {{ passive: true }});
   </script>
 </body>
 </html>
