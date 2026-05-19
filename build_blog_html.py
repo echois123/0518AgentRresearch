@@ -979,7 +979,7 @@ def build_page(article_html: str, toc_html: str) -> str:
       <article class="article">
 {article_html}
       </article>
-      <div class="footer-note">Generated from Final版本_统一排版版.md</div>
+      <div class="footer-note">From XIYUFAN 2026-05-18</div>
     </main>
   </div>
   <script>
