@@ -1,20 +1,28 @@
 import html
 import re
 import shutil
+import subprocess
 from pathlib import Path
 from typing import Optional
 
 from lxml import html as lxml_html
-from markdown_it import MarkdownIt
 from PIL import Image
 
+try:
+    from markdown_it import MarkdownIt
+except ModuleNotFoundError:
+    MarkdownIt = None
 
-SRC = Path("/Users/xyf/Documents/New project 3/Final版本_统一排版版.md")
-OUT = Path("/Users/xyf/Documents/New project 3/Final版本_统一排版版_blog.html")
+
+ROOT = Path(__file__).resolve().parent
+SRC = ROOT / "Final版本_统一排版版.md"
+OUT = ROOT / "Final版本_统一排版版_blog.html"
 PREVIEW_DIR = SRC.parent / ".preview-cache"
 DEPLOY_DIR = SRC.parent / "docs"
 PREVIEW_COMMON_WIDTH = 1200
 PREVIEW_DETAIL_WIDTH = 900
+NODE_BIN = Path("/Users/echofan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node")
+NODE_MODULES = Path("/Users/echofan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules")
 
 
 def strip_outer_wrapper(text: str) -> str:
@@ -327,8 +335,29 @@ def build_toc(headings: list[dict]) -> str:
 
 
 def render_html(markdown_text: str) -> str:
-    md = MarkdownIt("default", {"html": True, "linkify": False, "breaks": False})
-    return md.render(markdown_text)
+    if MarkdownIt is not None:
+        md = MarkdownIt("default", {"html": True, "linkify": False, "breaks": False})
+        return md.render(markdown_text)
+
+    node_script = (
+        "const { marked } = require('marked');"
+        "let input='';"
+        "process.stdin.setEncoding('utf8');"
+        "process.stdin.on('data', chunk => input += chunk);"
+        "process.stdin.on('end', () => {"
+        "  marked.setOptions({ gfm: true, breaks: false, mangle: false, headerIds: false });"
+        "  process.stdout.write(marked.parse(input));"
+        "});"
+    )
+    result = subprocess.run(
+        [str(NODE_BIN), "-e", node_script],
+        input=markdown_text,
+        text=True,
+        capture_output=True,
+        check=True,
+        env={"NODE_PATH": str(NODE_MODULES)},
+    )
+    return result.stdout
 
 
 def build_page(article_html: str, toc_html: str) -> str:
@@ -457,6 +486,9 @@ def build_page(article_html: str, toc_html: str) -> str:
     }}
     .article p {{
       margin: 0 0 22px;
+    }}
+    .article p.section-spacer {{
+      margin-top: 42px;
     }}
     .article p.table-caption,
     .article p.figure-caption {{
