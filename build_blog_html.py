@@ -559,19 +559,20 @@ def build_page(article_html: str, toc_html: str) -> str:
       }}
     }}
     .article blockquote {{
-      margin: 20px 0;
-      padding: 0 0 0 18px;
-      background: transparent;
-      border-left: 2px solid #d6d3d1;
-      border-radius: 0;
+      margin: 22px 0 26px;
+      padding: 12px 16px;
+      background: #f3f4f6;
+      border-left: 3px solid #9ca3af;
+      border-radius: 6px;
     }}
     .article blockquote p:last-child {{
       margin-bottom: 0;
     }}
     .article blockquote p,
     .article blockquote li {{
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1.8;
+      font-weight: 700;
     }}
     .callout {{
       margin: 24px 0 28px;
